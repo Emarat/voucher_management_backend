@@ -4,6 +4,7 @@ const app = express();
 const port = 3000;
 const loginController = require('./controller/loginController.js');
 const registerController = require('./controller/registerController.js');
+const customerController = require('./controller/customerController.js');
 
 
 // Enable all cors requests
@@ -11,6 +12,7 @@ app.use(cors());
 
 app.use('/', loginController);
 app.use('/', registerController);
+app.use('/', customerController);
 
 
 app.get('/', function (req, res) {
