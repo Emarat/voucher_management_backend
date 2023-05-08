@@ -2,10 +2,10 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
     user: 'postgres',
-    host: '192.168.1.196',
-    database: 'Voucher_Management',
+    host: 'localhost',
+    database: 'vms',
     password: 'postgres',
-    port: 5432,
+    port: 5440,
 });
 
 pool.query('SELECT * FROM customers', (err, res) => {
@@ -14,7 +14,7 @@ pool.query('SELECT * FROM customers', (err, res) => {
     } else {
         console.log('Successfully connected to the database');
     }
-    pool.end();
+    // pool.end();
 });
 
 module.exports = pool;
