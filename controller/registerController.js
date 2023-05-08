@@ -14,6 +14,7 @@ const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
+//route
 router.post('/register', async (req, res) => {
     try {
         // Get access token from Keycloak

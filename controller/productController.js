@@ -7,6 +7,7 @@ const pool = require('./../config/db');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
+//route
 router.route('/products')
     .post(async (req, res) => {
         try {
