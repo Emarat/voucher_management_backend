@@ -7,6 +7,23 @@ const pool = require('./../config/db');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
+//added projects
+router.post('/projects', async (req, res) => {
+    try {
+        const { name, contact } = req.body;
+
+        // Inserting data into PostgreSQL database
+        const query =
+            'INSERT INTO projects (name, contact) VALUES ($1, $2)';
+        await pool.query(query, [name, contact]);
+
+        res.status(201).send('Projects Added successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+})
+
 //route
 router.route('/customers')
     .post(async (req, res) => {
@@ -26,7 +43,7 @@ router.route('/customers')
     })
     .get(async (req, res) => {
         try {
-            const query = 'SELECT * FROM customers';
+            const query = 'SELECT customers.name, customers.contact, customers.address, customers.type FROM customers LEFT JOIN projects ON customers.customer_id = projects.customer_id'
             const results = await pool.query(query);
             res.json(results.rows);
         } catch (err) {
@@ -34,6 +51,8 @@ router.route('/customers')
             res.sendStatus(500);
         }
     })
+
+
 
 module.exports = router;
 

@@ -6,7 +6,7 @@ const loginController = require('./controller/loginController.js');
 const registerController = require('./controller/registerController.js');
 const customerController = require('./controller/customerController.js');
 const productControlller = require('./controller/productController.js');
-const chartOfAccountController = require('./controller/chartOfAccountController.js');
+const accountsController = require('./controller/accountsController.js');
 
 
 // Enable all cors requests
@@ -16,7 +16,7 @@ app.use('/', loginController);
 app.use('/', registerController);
 app.use('/', customerController);
 app.use('/', productControlller);
-app.use('/', chartOfAccountController);
+app.use('/', accountsController);
 
 
 app.get('/', function (req, res) {
