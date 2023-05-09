@@ -8,7 +8,7 @@ const pool = new Pool({
     port: 5440,
 });
 
-pool.query('SELECT * FROM customers', (err, res) => {
+pool.query('SELECT NOW()', (err, res) => {
     if (err) {
         console.error('Error connecting to the database', err.stack);
     } else {
