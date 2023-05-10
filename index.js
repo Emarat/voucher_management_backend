@@ -9,6 +9,7 @@ const productControlller = require('./controller/productController.js');
 const accountsController = require('./controller/accountsController.js');
 const categoryController = require('./controller/categoryController');
 const vendorController = require('./controller/vendorController');
+const uomController = require('./controller/uomController.js');
 
 
 // Enable all cors requests
@@ -21,6 +22,7 @@ app.use('/', productControlller);
 app.use('/', accountsController);
 app.use('/', categoryController);
 app.use('/', vendorController);
+app.use('/', uomController);
 
 
 app.get('/', function (req, res) {

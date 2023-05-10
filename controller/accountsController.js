@@ -60,7 +60,33 @@ router.route('/accounts')
             console.error(err);
             res.sendStatus(500);
         }
-    })
+    });
+
+//update init_bal_bank
+router.patch('/accounts/:id', async (req, res) => {
+    try {
+        const { init_bal_cash, init_bal_bank } = req.body;
+        const id = req.params.id;
+
+        // Updating data in PostgreSQL database
+        if (init_bal_cash !== undefined && init_bal_bank === undefined) {
+            const query = 'UPDATE accounts SET init_bal_cash = $1 WHERE account_id = $2';
+            await pool.query(query, [init_bal_cash, id]);
+        } else if (init_bal_cash === undefined && init_bal_bank !== undefined) {
+            const query = 'UPDATE accounts SET init_bal_bank = $1 WHERE account_id = $2';
+            await pool.query(query, [init_bal_bank, id]);
+        } else {
+            throw new Error('Invalid request. Please provide either init_bal_cash or init_bal_bank for update.');
+        }
+
+        res.status(200).send('Balance Updated Successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+})
+
+
 
 module.exports = router;
 
