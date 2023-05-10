@@ -7,6 +7,8 @@ const registerController = require('./controller/registerController.js');
 const customerController = require('./controller/customerController.js');
 const productControlller = require('./controller/productController.js');
 const accountsController = require('./controller/accountsController.js');
+const categoryController = require('./controller/categoryController');
+const vendorController = require('./controller/vendorController');
 
 
 // Enable all cors requests
@@ -17,6 +19,8 @@ app.use('/', registerController);
 app.use('/', customerController);
 app.use('/', productControlller);
 app.use('/', accountsController);
+app.use('/', categoryController);
+app.use('/', vendorController);
 
 
 app.get('/', function (req, res) {
