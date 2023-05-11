@@ -34,6 +34,24 @@ router.route('/products')
             res.sendStatus(500);
         }
     })
+    .delete(async (req, res) => {
+        try {
+            // execute the PostgreSQL query to delete all products
+            const result = await pool.query('DELETE FROM products');
+
+            // return a success response if at least one row was deleted
+            if (result.rowCount > 0) {
+                res.status(204).send();
+            } else {
+                // return a not found response if no rows were deleted
+                res.status(404).json({ error: 'No products found' });
+            }
+        } catch (error) {
+            // return a server error response if the query fails
+            console.error(error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    });
 
 //get products by using category_id
 router.get('/products/:id', async (req, res) => {
@@ -46,7 +64,29 @@ router.get('/products/:id', async (req, res) => {
         console.error(err);
         res.sendStatus(500);
     }
-})
+});
+
+//delete product by id
+router.delete('/products/:id', async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+        // execute the PostgreSQL query to delete the product by ID
+        const result = await pool.query('DELETE FROM products WHERE id = $1', [productId]);
+
+        if (result.rowCount === 1) {
+            // return a success response if one row was deleted
+            res.status(204).send();
+        } else {
+            // return a not found response if no rows were deleted
+            res.status(404).json({ error: 'Product not found' });
+        }
+    } catch (error) {
+        // return a server error response if the query fails
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 module.exports = router;
 
