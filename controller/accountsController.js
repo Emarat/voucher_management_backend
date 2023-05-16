@@ -62,29 +62,24 @@ router.route('/accounts')
         }
     });
 
-//update init_bal_bank
+//update chart of account
 router.patch('/accounts/:id', async (req, res) => {
     try {
-        const { init_bal_cash, init_bal_bank } = req.body;
-        const id = req.params.id;
+        const { account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description, status } = req.body;
+        const account_id = req.params.id;
 
         // Updating data in PostgreSQL database
-        if (init_bal_cash !== undefined && init_bal_bank === undefined) {
-            const query = 'UPDATE accounts SET init_bal_cash = $1 WHERE account_id = $2';
-            await pool.query(query, [init_bal_cash, id]);
-        } else if (init_bal_cash === undefined && init_bal_bank !== undefined) {
-            const query = 'UPDATE accounts SET init_bal_bank = $1 WHERE account_id = $2';
-            await pool.query(query, [init_bal_bank, id]);
-        } else {
-            throw new Error('Invalid request. Please provide either init_bal_cash or init_bal_bank for update.');
-        }
+        const query =
+            'UPDATE accounts SET account_name=$1, parent=$2, account_type_id=$3, account_details_type_id=$4, init_bal_cash=$5, init_bal_bank=$6, description=$7, status=$8 WHERE account_id=$9';
+        await pool.query(query, [account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description, status, account_id]);
 
-        res.status(200).send('Balance Updated Successfully!');
+        res.status(200).send('Chart Of Account Updated Successfully!');
     } catch (err) {
         console.error(err);
         res.sendStatus(500);
     }
-})
+});
+
 
 
 

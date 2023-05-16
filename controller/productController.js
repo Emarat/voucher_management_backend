@@ -88,5 +88,24 @@ router.delete('/products/:id', async (req, res) => {
     }
 });
 
+//update products
+router.patch('/products/:id', async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const { name, category_id, status } = req.body;
+
+        // Updating data in PostgreSQL database
+        const query =
+            'UPDATE products SET name=$1, category_id=$2, status=$3 WHERE id=$4';
+        await pool.query(query, [name, category_id, status, productId]);
+
+        res.status(200).send('Product Updated successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+
 module.exports = router;
 

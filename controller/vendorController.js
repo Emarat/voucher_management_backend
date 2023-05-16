@@ -35,5 +35,31 @@ router.route('/vendor')
         }
     })
 
+
+router.patch('/vendors/:id', async (req, res) => {
+    try {
+        const { vendor_name, vendor_type, vendor_contact, vendor_number, status } = req.body;
+        const { id } = req.params;
+
+        // Checking if the vendor exists
+        const checkQuery = 'SELECT * FROM vendor WHERE vendor_id = $1';
+        const { rows } = await pool.query(checkQuery, [id]);
+        if (rows.length === 0) {
+            return res.status(404).send('Vendor not found');
+        }
+
+        // Updating vendor data in PostgreSQL database
+        const updateQuery =
+            'UPDATE vendor SET vendor_name = $1, vendor_type = $2, vendor_contact = $3, vendor_number = $4, status=$5 WHERE vendor_id = $6';
+        await pool.query(updateQuery, [vendor_name, vendor_type, vendor_contact, vendor_number, status, id]);
+
+        res.status(200).send('Vendor updated successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+
 module.exports = router;
 

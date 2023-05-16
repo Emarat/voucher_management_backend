@@ -10,6 +10,9 @@ const accountsController = require('./controller/accountsController.js');
 const categoryController = require('./controller/categoryController');
 const vendorController = require('./controller/vendorController');
 const uomController = require('./controller/uomController.js');
+const camundaController = require('./controller/camundaController.js');
+// const keycloakCamunda = require('./controller/keycloakCamunda.js');
+const formController = require('./controller/formController.js');
 
 
 // Enable all cors requests
@@ -23,6 +26,9 @@ app.use('/', accountsController);
 app.use('/', categoryController);
 app.use('/', vendorController);
 app.use('/', uomController);
+app.use('/', camundaController);
+// app.use('/', keycloakCamunda);
+app.use('/', formController);
 
 
 app.get('/', function (req, res) {
