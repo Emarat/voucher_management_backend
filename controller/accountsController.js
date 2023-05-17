@@ -36,12 +36,12 @@ router.get('/accountDetailsType', async (req, res) => {
 router.route('/accounts')
     .post(async (req, res) => {
         try {
-            const { account_name, parent, account_type, account_type_id, account_details_type, account_details_type_id, init_bal_cash, init_bal_bank, description } = req.body;
+            const { account_name, parent, account_type, account_type_id, account_details_type, account_details_type_id, init_bal_cash, init_bal_bank, status, description } = req.body;
 
             // Inserting data into PostgreSQL database
             const query =
-                'INSERT INTO accounts (  account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-            await pool.query(query, [account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description]);
+                'INSERT INTO accounts (  account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
+            await pool.query(query, [account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description, status]);
 
             res.status(201).send('Chart Of Account Created Successfully!');
         } catch (err) {
