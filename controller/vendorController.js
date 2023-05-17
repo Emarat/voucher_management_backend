@@ -12,12 +12,12 @@ router.route('/vendor')
     //post vendor data
     .post(async (req, res) => {
         try {
-            const { vendor_name, vendor_type, vendor_contact, vendor_number } = req.body;
+            const { vendor_name, vendor_type, vendor_contact, vendor_number, status } = req.body;
 
             // Inserting data into PostgreSQL database
             const query =
-                'INSERT INTO vendor (vendor_name, vendor_type, vendor_contact, vendor_number) VALUES ($1, $2, $3, $4)';
-            await pool.query(query, [vendor_name, vendor_type, vendor_contact, vendor_number]);
+                'INSERT INTO vendor (vendor_name, vendor_type, vendor_contact, vendor_number, status) VALUES ($1, $2, $3, $4, $5)';
+            await pool.query(query, [vendor_name, vendor_type, vendor_contact, vendor_number, status]);
 
             res.status(201).send('Vendor Added successfully!');
         } catch (err) {
@@ -89,21 +89,25 @@ router.delete('/vendors/:id', async (req, res) => {
 //delete multiple vendors by id
 router.delete('/vendors', async (req, res) => {
     const vendorId = req.body.ids;
+    console.log(vendorId);
+    if (!Array.isArray(vendorId)) {
+        return res.status(400).json({ error: 'Invalid request' });
+    }
 
     try {
         let deletedCount = 0;
         for (const id of vendorId) {
             // execute the PostgreSQL query to delete the product by ID
-            const result = await pool.query('DELETE FROM vendor WHERE id = $1', [id]);
+            const result = await pool.query('DELETE FROM vendor WHERE vendor_id = $1', [id]);
 
-            if (result.rowCount === 1) {
+            if (result.rowCount >= 1) {
                 deletedCount++;
             }
         }
 
         if (deletedCount > 0) {
             // return a success response if at least one row was deleted
-            res.status(204).send();
+            res.status(204).send('Successfully Deleted!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Vendors not found' });

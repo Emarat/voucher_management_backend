@@ -11,12 +11,12 @@ router.use(bodyParser.json());
 router.route('/category')
     .post(async (req, res) => {
         try {
-            const { category_name, category_description } = req.body;
+            const { category_name, status, category_description } = req.body;
 
             // Inserting data into PostgreSQL database
             const query =
-                'INSERT INTO category (category_name, category_description) VALUES ($1, $2)';
-            await pool.query(query, [category_name, category_description]);
+                'INSERT INTO category (category_name,status, category_description) VALUES ($1, $2, $3)';
+            await pool.query(query, [category_name, status, category_description]);
 
             res.status(201).send('Category Added successfully!');
         } catch (err) {
@@ -84,21 +84,24 @@ router.delete('/category/:id', async (req, res) => {
 //delete multiple products by id
 router.delete('/categories', async (req, res) => {
     const categoryId = req.body.ids;
+    if (!Array.isArray(categoryId)) {
+        return res.status(400).json({ error: 'Invalid request' });
+    }
 
     try {
         let deletedCount = 0;
         for (const id of categoryId) {
             // execute the PostgreSQL query to delete the product by ID
-            const result = await pool.query('DELETE FROM categories WHERE id = $1', [id]);
+            const result = await pool.query('DELETE FROM category WHERE category_id = $1', [id]);
 
-            if (result.rowCount === 1) {
+            if (result.rowCount >= 1) {
                 deletedCount++;
             }
         }
 
         if (deletedCount > 0) {
             // return a success response if at least one row was deleted
-            res.status(204).send();
+            res.status(204).send('Successfully Deleted!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Categories not found' });

@@ -104,16 +104,16 @@ router.delete('/accounts', async (req, res) => {
         let deletedCount = 0;
         for (const id of accountId) {
             // execute the PostgreSQL query to delete the product by ID
-            const result = await pool.query('DELETE FROM accounts WHERE id = $1', [id]);
+            const result = await pool.query('DELETE FROM accounts WHERE account_id = $1', [id]);
 
-            if (result.rowCount === 1) {
+            if (result.rowCount >= 1) {
                 deletedCount++;
             }
         }
 
         if (deletedCount > 0) {
             // return a success response if at least one row was deleted
-            res.status(204).send();
+            res.status(204).send('Accounts deleted successfully!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Accounts not found' });
