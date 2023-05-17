@@ -26,7 +26,49 @@ router.post('/projects', async (req, res) => {
         console.error(err);
         res.sendStatus(500);
     }
-})
+});
+
+//get projects by id
+router.get('/projects/:id', async (req, res) => {
+    try {
+        const projectId = req.params.id;
+
+        // Retrieving data from PostgreSQL database
+        const query = 'SELECT * FROM projects WHERE project_id=$1';
+        const result = await pool.query(query, [projectId]);
+
+        if (result.rows.length === 0) {
+            res.status(404).send('Project not found!');
+        } else {
+            res.status(200).json(result.rows[0]);
+        }
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+//delete project by id
+router.delete('/projects/:id', async (req, res) => {
+    try {
+        const projectId = req.params.id;
+
+        // Deleting data from PostgreSQL database
+        const query = 'DELETE FROM projects WHERE project_id=$1';
+        const result = await pool.query(query, [projectId]);
+
+        if (result.rowCount === 0) {
+            res.status(404).send('Project not found!');
+        } else {
+            res.status(200).send('Project deleted successfully!');
+        }
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+
 
 //route
 router.route('/customers')
@@ -57,7 +99,22 @@ router.route('/customers')
             console.error(err);
             res.sendStatus(500);
         }
-    })
+    });
+
+//delete customer by id
+router.delete('/customers/:id', async (req, res) => {
+    try {
+        const customerId = req.params.id;
+        //delete from postgres db
+        const query = 'DELETE FROM customers WHERE customer_id=$1';
+        await pool.query(query, [customerId]);
+
+        res.status(200).send('Customer Deleted Successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
 
 
 

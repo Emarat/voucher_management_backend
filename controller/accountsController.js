@@ -80,6 +80,52 @@ router.patch('/accounts/:id', async (req, res) => {
     }
 });
 
+//delete account by id
+router.delete('/accounts/:id', async (req, res) => {
+    try {
+        const account_id = req.params.id;
+
+        // Deleting data from PostgreSQL database
+        const query = 'DELETE FROM accounts WHERE account_id=$1';
+        await pool.query(query, [account_id]);
+
+        res.status(200).send('Chart Of Account Deleted Successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+//multiple accounts delete
+router.delete('/accounts', async (req, res) => {
+    const accountId = req.body.ids;
+
+    try {
+        let deletedCount = 0;
+        for (const id of accountId) {
+            // execute the PostgreSQL query to delete the product by ID
+            const result = await pool.query('DELETE FROM accounts WHERE id = $1', [id]);
+
+            if (result.rowCount === 1) {
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0) {
+            // return a success response if at least one row was deleted
+            res.status(204).send();
+        } else {
+            // return a not found response if no rows were deleted
+            res.status(404).json({ error: 'Accounts not found' });
+        }
+    } catch (error) {
+        // return a server error response if the query fails
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 
 
 

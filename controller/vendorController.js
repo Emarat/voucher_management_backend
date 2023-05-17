@@ -9,6 +9,7 @@ router.use(bodyParser.json());
 
 //route
 router.route('/vendor')
+    //post vendor data
     .post(async (req, res) => {
         try {
             const { vendor_name, vendor_type, vendor_contact, vendor_number } = req.body;
@@ -24,6 +25,7 @@ router.route('/vendor')
             res.sendStatus(500);
         }
     })
+    //get vendor data
     .get(async (req, res) => {
         try {
             const query = 'SELECT * FROM vendor';
@@ -35,7 +37,7 @@ router.route('/vendor')
         }
     })
 
-
+//update vendor by id
 router.patch('/vendors/:id', async (req, res) => {
     try {
         const { vendor_name, vendor_type, vendor_contact, vendor_number, status } = req.body;
@@ -57,6 +59,59 @@ router.patch('/vendors/:id', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.sendStatus(500);
+    }
+});
+
+//delete vendor by id
+
+router.delete('/vendors/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Checking if the vendor exists
+        const checkQuery = 'SELECT * FROM vendor WHERE vendor_id = $1';
+        const { rows } = await pool.query(checkQuery, [id]);
+        if (rows.length === 0) {
+            return res.status(404).send('Vendor not found');
+        }
+
+        // Deleting the vendor from PostgreSQL database
+        const deleteQuery = 'DELETE FROM vendor WHERE vendor_id = $1';
+        await pool.query(deleteQuery, [id]);
+
+        res.status(200).send('Vendor deleted successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+//delete multiple vendors by id
+router.delete('/vendors', async (req, res) => {
+    const vendorId = req.body.ids;
+
+    try {
+        let deletedCount = 0;
+        for (const id of vendorId) {
+            // execute the PostgreSQL query to delete the product by ID
+            const result = await pool.query('DELETE FROM vendor WHERE id = $1', [id]);
+
+            if (result.rowCount === 1) {
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0) {
+            // return a success response if at least one row was deleted
+            res.status(204).send();
+        } else {
+            // return a not found response if no rows were deleted
+            res.status(404).json({ error: 'Vendors not found' });
+        }
+    } catch (error) {
+        // return a server error response if the query fails
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 

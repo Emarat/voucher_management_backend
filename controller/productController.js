@@ -88,6 +88,36 @@ router.delete('/products/:id', async (req, res) => {
     }
 });
 
+//delete multiple products by id
+router.delete('/products', async (req, res) => {
+    const productIds = req.body.ids;
+
+    try {
+        let deletedCount = 0;
+        for (const id of productIds) {
+            // execute the PostgreSQL query to delete the product by ID
+            const result = await pool.query('DELETE FROM products WHERE id = $1', [id]);
+
+            if (result.rowCount === 1) {
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0) {
+            // return a success response if at least one row was deleted
+            res.status(204).send();
+        } else {
+            // return a not found response if no rows were deleted
+            res.status(404).json({ error: 'Products not found' });
+        }
+    } catch (error) {
+        // return a server error response if the query fails
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 //update products
 router.patch('/products/:id', async (req, res) => {
     try {

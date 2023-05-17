@@ -66,5 +66,50 @@ router.patch('/category/:id', async (req, res) => {
     }
 });
 
+//delete category by id
+router.delete('/category/:id', async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        //delete from postgres db
+        const query = 'DELETE FROM category WHERE category_id=$1';
+        await pool.query(query, [categoryId]);
+
+        res.status(200).send('Category Deleted Successfully!');
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+//delete multiple products by id
+router.delete('/categories', async (req, res) => {
+    const categoryId = req.body.ids;
+
+    try {
+        let deletedCount = 0;
+        for (const id of categoryId) {
+            // execute the PostgreSQL query to delete the product by ID
+            const result = await pool.query('DELETE FROM categories WHERE id = $1', [id]);
+
+            if (result.rowCount === 1) {
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0) {
+            // return a success response if at least one row was deleted
+            res.status(204).send();
+        } else {
+            // return a not found response if no rows were deleted
+            res.status(404).json({ error: 'Categories not found' });
+        }
+    } catch (error) {
+        // return a server error response if the query fails
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 module.exports = router;
 
