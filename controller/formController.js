@@ -122,18 +122,42 @@ router.post('/status', async (req, res) => {
 
 
 //get
-router.get('/reqFormView', async (req, res) => {
-    try {
+// router.get('/reqFormView', async (req, res) => {
+//     try {
 
-        const query = 'SELECT * from requisition_master_data '
-        const results = await pool.query(query);
-        res.json(results);
-        console.log(results.rows);
+//         const query = 'SELECT * from requisition_master_data '
+//         const results = await pool.query(query);
+//         res.json(results);
+//         console.log(results.rows);
+//     } catch (err) {
+//         console.error(err);
+//         res.sendStatus(500);
+//     }
+// })
+// Retrieve all requisition data
+router.get('/allData', async (req, res) => {
+    try {
+        // Query to retrieve all requisition data
+        const query = `SELECT * FROM
+                        requisition_master_data,
+                        requisition_details_data,
+                        requisition_file_details,
+                        requisition_history,
+                        requisition_status
+                       WHERE 
+                        requisition_master_data.requisition_id = requisition_details_data.requisition_master_id AND
+                        requisition_master_data.requisition_id = requisition_file_details.requisition_master_id AND
+                        requisition_master_data.requisition_id = requisition_history.requisition_master_id AND
+                        requisition_master_data.requisition_id = requisition_status.requisition_master_id`;
+
+        const result = await pool.query(query);
+        res.send(result.rows); // Send the data as a response
     } catch (err) {
         console.error(err);
         res.sendStatus(500);
     }
-})
+});
+
 
 module.exports = router;
 
