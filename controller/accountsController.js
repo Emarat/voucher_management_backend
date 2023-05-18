@@ -49,7 +49,6 @@ router.route('/accounts')
             res.sendStatus(500);
         }
     })
-
     .get(async (req, res) => {
         try {
             const query = 'SELECT accounts.account_id, accounts.status, accounts.parent, accounts.account_name, trim(account_type.account_type_name) as account_type_name, trim(account_detail_type.account_detail_name) as account_detail_type_name, accounts.init_bal_cash, accounts.init_bal_bank, accounts.description FROM accounts LEFT JOIN account_type on accounts.account_type_id = account_type.account_type_id LEFT JOIN account_detail_type on accounts.account_details_type_id = account_detail_type.account_detail_type_id ';
@@ -61,6 +60,30 @@ router.route('/accounts')
             res.sendStatus(500);
         }
     });
+
+
+//get accounts data by id 
+router.get('/accounts/:id', async (req, res) => {
+    try {
+        // Extracting account ID from request parameters
+        const account_id = req.params.id;
+
+        // Querying PostgreSQL database for the account with the specified ID
+        const query = 'SELECT * FROM accounts WHERE account_id = $1';
+        const result = await pool.query(query, [account_id]);
+
+        // Sending response with the account details
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).send('Account not found');
+        }
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
 
 //update chart of account
 router.patch('/accounts/:id', async (req, res) => {
