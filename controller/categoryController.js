@@ -101,7 +101,7 @@ router.delete('/categories', async (req, res) => {
 
         if (deletedCount > 0) {
             // return a success response if at least one row was deleted
-            res.status(204).send('Successfully Deleted!');
+            res.status(200).send('Successfully Deleted!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Categories not found' });

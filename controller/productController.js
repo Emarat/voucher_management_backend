@@ -11,12 +11,12 @@ router.use(bodyParser.json());
 router.route('/products')
     .post(async (req, res) => {
         try {
-            const { name, category_id } = req.body;
+            const { name, category_id, status } = req.body;
 
             // Inserting data into PostgreSQL database
             const query =
-                'INSERT INTO products (name, category_id) VALUES ($1, $2)';
-            await pool.query(query, [name, category_id]);
+                'INSERT INTO products (name, category_id, status) VALUES ($1, $2, $3)';
+            await pool.query(query, [name, category_id, status]);
 
             res.status(201).send('Product Added successfully!');
         } catch (err) {
@@ -26,7 +26,7 @@ router.route('/products')
     })
     .get(async (req, res) => {
         try {
-            const query = 'SELECT * FROM products';
+            const query = 'SELECT products.*,  category_name FROM products LEFT JOIN category ON products.category_id = category.category_id';
             const results = await pool.query(query);
             res.json(results.rows);
         } catch (err) {
@@ -34,6 +34,7 @@ router.route('/products')
             res.sendStatus(500);
         }
     })
+
     .delete(async (req, res) => {
         try {
             // execute the PostgreSQL query to delete all products
@@ -41,7 +42,7 @@ router.route('/products')
 
             // return a success response if at least one row was deleted
             if (result.rowCount > 0) {
-                res.status(204).send();
+                res.status(204).send('Delete All Products Successfully');
             } else {
                 // return a not found response if no rows were deleted
                 res.status(404).json({ error: 'No products found' });
@@ -74,9 +75,9 @@ router.delete('/products/:id', async (req, res) => {
         // execute the PostgreSQL query to delete the product by ID
         const result = await pool.query('DELETE FROM products WHERE id = $1', [productId]);
 
-        if (result.rowCount === 1) {
+        if (result.rowCount >= 1) {
             // return a success response if one row was deleted
-            res.status(204).send();
+            res.status(204).send('Delete  Product Successfully');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Product not found' });
@@ -89,23 +90,30 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 //delete multiple products by id
-router.delete('/products', async (req, res) => {
+router.delete('/batchProducts', async (req, res) => {
     const productIds = req.body.ids;
+
+    if (!Array.isArray(productIds)) {
+        return res.status(400).json({ error: 'Invalid request' });
+    }
 
     try {
         let deletedCount = 0;
         for (const id of productIds) {
             // execute the PostgreSQL query to delete the product by ID
             const result = await pool.query('DELETE FROM products WHERE id = $1', [id]);
+            // console.log(result);
 
-            if (result.rowCount === 1) {
+            if (result.rowCount >= 1) {
                 deletedCount++;
             }
         }
+        // console.log(deletedCount);
 
         if (deletedCount > 0) {
+            // console.log(deletedCount);
             // return a success response if at least one row was deleted
-            res.status(204).send();
+            res.status(200).send('Successfully Deleted!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Products not found' });
@@ -116,6 +124,8 @@ router.delete('/products', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
+
 
 
 //update products

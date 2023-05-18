@@ -113,7 +113,7 @@ router.delete('/accounts', async (req, res) => {
 
         if (deletedCount > 0) {
             // return a success response if at least one row was deleted
-            res.status(204).send('Accounts deleted successfully!');
+            res.status(200).send('Accounts deleted successfully!');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Accounts not found' });
