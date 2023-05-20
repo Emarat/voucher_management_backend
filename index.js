@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors')
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 const port = 3000;
 const loginController = require('./controller/loginController.js');
 const registerController = require('./controller/registerController.js');
@@ -14,6 +16,9 @@ const camundaController = require('./controller/camundaController.js');
 // const keycloakCamunda = require('./controller/keycloakCamunda.js');
 const formController = require('./controller/formController.js');
 
+
+//swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Enable all cors requests
 app.use(cors());

@@ -1,0 +1,1927 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Vaoucher Management API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/accountType": {
+            "get": {
+                "summary": "Get account types",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AccountType"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/accountDetailsType": {
+            "get": {
+                "summary": "Get account details types",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AccountDetailsType"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/accounts": {
+            "post": {
+                "summary": "Create an account",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAccountRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successfully created"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get accounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Account"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete multiple accounts",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteAccountsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted"
+                    },
+                    "404": {
+                        "description": "Accounts not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/accounts/{id}": {
+            "get": {
+                "summary": "Get account by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update an account",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAccountRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an account by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Account ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "User login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": "You are logged in!"
+                    },
+                    "401": {
+                        "description": "Invalid username or password",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": "Invalid username or password"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "summary": "Register a new user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRegistration"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error creating user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/category": {
+            "post": {
+                "summary": "Create a new category",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category Added successfully!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get all categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/category/{id}": {
+            "get": {
+                "summary": "Get category by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update a category",
+                "operationId": "updateCategory",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully!",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a category",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The ID of the category to delete"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "delete": {
+                "summary": "Delete categories",
+                "operationId": "deleteCategories",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categories not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects": {
+            "post": {
+                "summary": "Create a new project",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "contact": {
+                                        "type": "string"
+                                    },
+                                    "customer_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "contact",
+                                    "customer_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project added successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/projects/{id}": {
+            "get": {
+                "summary": "Get a project by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Project"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a project by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project deleted successfully"
+                    },
+                    "404": {
+                        "description": "Project not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/customers": {
+            "post": {
+                "summary": "Create a new customer",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "contact": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "contact",
+                                    "address",
+                                    "type"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Customer created successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get customers with associated projects",
+                "responses": {
+                    "200": {
+                        "description": "Customers retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomersWithProjects"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/customers/{id}": {
+            "delete": {
+                "summary": "Delete a customer by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer deleted successfully"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/products": {
+            "post": {
+                "summary": "Create a new product",
+                "operationId": "createProduct",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Product"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product added successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get all products",
+                "operationId": "getAllProducts",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete all products",
+                "operationId": "deleteAllProducts",
+                "responses": {
+                    "204": {
+                        "description": "Delete all products successfully"
+                    },
+                    "404": {
+                        "description": "No products found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "summary": "Get products by category ID",
+                "operationId": "getProductsByCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Category ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete product by ID",
+                "operationId": "deleteProductById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Product ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Delete product successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update product by ID",
+                "operationId": "updateProductById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "Product ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/batchProducts": {
+            "delete": {
+                "summary": "Delete multiple products by ID",
+                "operationId": "deleteMultipleProducts",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BatchProductIds"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Products not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/uom": {
+            "get": {
+                "summary": "Get all UOM",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UOM"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/vendor": {
+            "post": {
+                "summary": "Add a new vendor",
+                "requestBody": {
+                    "description": "Vendor data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "vendor_name": {
+                                        "type": "string"
+                                    },
+                                    "vendor_type": {
+                                        "type": "string"
+                                    },
+                                    "vendor_contact": {
+                                        "type": "string"
+                                    },
+                                    "vendor_number": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "vendor_name",
+                                    "vendor_type",
+                                    "vendor_contact",
+                                    "vendor_number",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Vendor Added successfully!"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get all vendors",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Vendor"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/vendors/{id}": {
+            "patch": {
+                "summary": "Update a vendor by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the vendor to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Vendor data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "vendor_name": {
+                                        "type": "string"
+                                    },
+                                    "vendor_type": {
+                                        "type": "string"
+                                    },
+                                    "vendor_contact": {
+                                        "type": "string"
+                                    },
+                                    "vendor_number": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vendor updated successfully!"
+                    },
+                    "404": {
+                        "description": "Vendor not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a vendor by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the vendor to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vendor deleted successfully!"
+                    },
+                    "404": {
+                        "description": "Vendor not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/vendors": {
+            "delete": {
+                "summary": "Delete multiple vendors by ID",
+                "requestBody": {
+                    "description": "Array of vendor IDs",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "ids"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully Deleted!"
+                    },
+                    "404": {
+                        "description": "Vendors not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/reqMasterData": {
+            "post": {
+                "summary": "Submit master data",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReqMasterData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Master Data Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/detailsData": {
+            "post": {
+                "summary": "Submit details data",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DetailsData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Details Data Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/fileDetails": {
+            "post": {
+                "summary": "Submit file details",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FileDetails"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "File Details Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/reqHistory": {
+            "post": {
+                "summary": "Submit requisition history",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReqHistory"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Requisition History Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/reqStatus": {
+            "post": {
+                "summary": "Submit requisition status",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ReqStatus"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Requisition Status Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/status": {
+            "post": {
+                "summary": "Submit status",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Status"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Requisition Status Submitted!"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/allData": {
+            "get": {
+                "summary": "Retrieve all requisition data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RequisitionData"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/start/{key}": {
+            "post": {
+                "summary": "Start a new process instance",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Process key",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Process instance started successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "description": "Process instance ID"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error starting process instance"
+                    }
+                }
+            }
+        },
+        "/processInstances": {
+            "get": {
+                "summary": "Get all active process instances",
+                "responses": {
+                    "200": {
+                        "description": "Active process instances retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProcessInstance"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error getting process instances"
+                    }
+                }
+            }
+        },
+        "/userTasks": {
+            "post": {
+                "summary": "Get all tasks assigned to a user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserTasksRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tasks retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Task"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error getting user tasks"
+                    }
+                }
+            }
+        },
+        "/completeTask": {
+            "post": {
+                "summary": "Complete a task",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteTaskRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task completed successfully"
+                    },
+                    "500": {
+                        "description": "Error completing task"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AccountType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AccountDetailsType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Account": {
+                "type": "object",
+                "properties": {
+                    "account_id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "parent": {
+                        "type": "string"
+                    },
+                    "account_name": {
+                        "type": "string"
+                    },
+                    "account_type_name": {
+                        "type": "string"
+                    },
+                    "account_detail_type_name": {
+                        "type": "string"
+                    },
+                    "init_bal_cash": {
+                        "type": "number"
+                    },
+                    "init_bal_bank": {
+                        "type": "number"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            },
+            "CreateAccountRequest": {
+                "type": "object",
+                "properties": {
+                    "account_name": {
+                        "type": "string"
+                    },
+                    "parent": {
+                        "type": "string"
+                    },
+                    "account_type_id": {
+                        "type": "integer"
+                    },
+                    "account_details_type_id": {
+                        "type": "integer"
+                    },
+                    "init_bal_cash": {
+                        "type": "number"
+                    },
+                    "init_bal_bank": {
+                        "type": "number"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateAccountRequest": {
+                "type": "object",
+                "properties": {
+                    "account_name": {
+                        "type": "string"
+                    },
+                    "parent": {
+                        "type": "string"
+                    },
+                    "account_type_id": {
+                        "type": "integer"
+                    },
+                    "account_details_type_id": {
+                        "type": "integer"
+                    },
+                    "init_bal_cash": {
+                        "type": "number"
+                    },
+                    "init_bal_bank": {
+                        "type": "number"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "DeleteAccountsRequest": {
+                "type": "object",
+                "properties": {
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "LoginRequest": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "username",
+                    "password"
+                ]
+            },
+            "UserRegistration": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserResponse": {
+                "type": "object"
+            },
+            "Category": {
+                "type": "object",
+                "properties": {
+                    "category_name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "category_description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "category_name",
+                    "status"
+                ]
+            },
+            "ProducCategoryID": {
+                "type": "object",
+                "properties": {
+                    "category_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateCategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "category_name": {
+                        "type": "string"
+                    },
+                    "category_description": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "category_name",
+                    "category_description",
+                    "status"
+                ]
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "message"
+                ]
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "$ref": "#/components/schemas/Error"
+                    }
+                },
+                "required": [
+                    "error"
+                ]
+            },
+            "deleteError": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Project": {
+                "type": "object",
+                "properties": {
+                    "project_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "contact": {
+                        "type": "string"
+                    },
+                    "customer_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "CustomersWithProjects": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "customer_id": {
+                            "type": "integer"
+                        },
+                        "customer_name": {
+                            "type": "string"
+                        },
+                        "customer_contact": {
+                            "type": "string"
+                        },
+                        "customer_address": {
+                            "type": "string"
+                        },
+                        "customer_type": {
+                            "type": "string"
+                        },
+                        "project_name": {
+                            "type": "string"
+                        },
+                        "project_contact": {
+                            "type": "string"
+                        },
+                        "project_id": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "Product": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "category_id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "category_id",
+                    "status"
+                ]
+            },
+            "BatchProductIds": {
+                "type": "object",
+                "properties": {
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "required": [
+                    "ids"
+                ]
+            },
+            "ProductUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "category_id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UOM": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Vendor": {
+                "type": "object",
+                "properties": {
+                    "vendor_id": {
+                        "type": "integer"
+                    },
+                    "vendor_name": {
+                        "type": "string"
+                    },
+                    "vendor_type": {
+                        "type": "string"
+                    },
+                    "vendor_contact": {
+                        "type": "string"
+                    },
+                    "vendor_number": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ReqMasterData": {
+                "type": "object",
+                "properties": {
+                    "requisition_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "customer_id": {
+                        "type": "string"
+                    },
+                    "project_id": {
+                        "type": "string"
+                    },
+                    "supplier_id": {
+                        "type": "string"
+                    },
+                    "total_amount": {
+                        "type": "number"
+                    }
+                }
+            },
+            "DetailsData": {
+                "type": "object",
+                "properties": {
+                    "requisition_details_id": {
+                        "type": "string"
+                    },
+                    "requisition_master_id": {
+                        "type": "string"
+                    },
+                    "item_category_id": {
+                        "type": "string"
+                    },
+                    "item_name": {
+                        "type": "string"
+                    },
+                    "uom": {
+                        "type": "string"
+                    },
+                    "qty": {
+                        "type": "number"
+                    },
+                    "unit_price": {
+                        "type": "number"
+                    }
+                }
+            },
+            "FileDetails": {
+                "type": "object",
+                "properties": {
+                    "requisition_file_id": {
+                        "type": "string"
+                    },
+                    "requisition_master_id": {
+                        "type": "string"
+                    },
+                    "file_url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ReqHistory": {
+                "type": "object",
+                "properties": {
+                    "history_id": {
+                        "type": "string"
+                    },
+                    "requisition_master_id": {
+                        "type": "string"
+                    },
+                    "action_done_by": {
+                        "type": "string"
+                    },
+                    "action_status_id": {
+                        "type": "string"
+                    },
+                    "comments": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ReqStatus": {
+                "type": "object",
+                "properties": {
+                    "requisition_status_id": {
+                        "type": "string"
+                    },
+                    "requisition_master_id": {
+                        "type": "string"
+                    },
+                    "status_id": {
+                        "type": "string"
+                    },
+                    "assigned_to": {
+                        "type": "string"
+                    },
+                    "comments": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Status": {
+                "type": "object",
+                "properties": {
+                    "status_id": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RequisitionData": {
+                "type": "object",
+                "properties": {
+                    "requisition_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "customer_id": {
+                        "type": "string"
+                    },
+                    "project_id": {
+                        "type": "string"
+                    },
+                    "supplier_id": {
+                        "type": "string"
+                    },
+                    "total_amount": {
+                        "type": "number"
+                    },
+                    "requisition_details_id": {
+                        "type": "string"
+                    },
+                    "item_category_id": {
+                        "type": "string"
+                    },
+                    "item_name": {
+                        "type": "string"
+                    },
+                    "uom": {
+                        "type": "string"
+                    },
+                    "qty": {
+                        "type": "number"
+                    },
+                    "unit_price": {
+                        "type": "number"
+                    },
+                    "requisition_file_id": {
+                        "type": "string"
+                    },
+                    "file_url": {
+                        "type": "string"
+                    },
+                    "history_id": {
+                        "type": "string"
+                    },
+                    "action_done_by": {
+                        "type": "string"
+                    },
+                    "action_status_id": {
+                        "type": "string"
+                    },
+                    "comments": {
+                        "type": "string"
+                    },
+                    "requisition_status_id": {
+                        "type": "string"
+                    },
+                    "status_id": {
+                        "type": "string"
+                    },
+                    "assigned_to": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ProcessInstance": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Process instance ID"
+                    }
+                }
+            },
+            "UserTasksRequest": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string",
+                        "description": "User ID"
+                    }
+                }
+            },
+            "Task": {
+                "type": "object",
+                "properties": {}
+            },
+            "CompleteTaskRequest": {
+                "type": "object",
+                "properties": {
+                    "taskId": {
+                        "type": "string",
+                        "description": "Task ID"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "description": "User ID"
+                    }
+                }
+            }
+        }
+    }
+}

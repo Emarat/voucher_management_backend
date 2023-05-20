@@ -121,20 +121,7 @@ router.post('/status', async (req, res) => {
 });
 
 
-//get
-// router.get('/reqFormView', async (req, res) => {
-//     try {
 
-//         const query = 'SELECT * from requisition_master_data '
-//         const results = await pool.query(query);
-//         res.json(results);
-//         console.log(results.rows);
-//     } catch (err) {
-//         console.error(err);
-//         res.sendStatus(500);
-//     }
-// })
-// Retrieve all requisition data
 router.get('/allData', async (req, res) => {
     try {
         // Query to retrieve all requisition data
