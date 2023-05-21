@@ -705,7 +705,7 @@
                 "summary": "Delete all products",
                 "operationId": "deleteAllProducts",
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Delete all products successfully"
                     },
                     "404": {

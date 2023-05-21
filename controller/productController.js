@@ -42,7 +42,7 @@ router.route('/products')
 
             // return a success response if at least one row was deleted
             if (result.rowCount > 0) {
-                res.status(204).send('Delete All Products Successfully');
+                res.status(200).send('Delete All Products Successfully');
             } else {
                 // return a not found response if no rows were deleted
                 res.status(404).json({ error: 'No products found' });
