@@ -283,6 +283,36 @@
                 }
             }
         },
+        "/users": {
+            "get": {
+                "summary": "Get all users",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error retrieving users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/category": {
             "post": {
                 "summary": "Create a new category",
@@ -610,6 +640,9 @@
                     "201": {
                         "description": "Customer created successfully"
                     },
+                    "400": {
+                        "description": "Customer already exists!"
+                    },
                     "500": {
                         "description": "Internal server error"
                     }
@@ -673,6 +706,9 @@
                 "responses": {
                     "201": {
                         "description": "Product added successfully"
+                    },
+                    "400": {
+                        "description": "Product already exists!"
                     },
                     "500": {
                         "description": "Server error"
@@ -1490,6 +1526,14 @@
                         "type": "string"
                     }
                 }
+            },
+            "User": {
+                "type": "object",
+                "properties": {}
+            },
+            "GETUSERError": {
+                "type": "object",
+                "properties": {}
             },
             "UserResponse": {
                 "type": "object"
