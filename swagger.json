@@ -766,7 +766,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Delete product successfully"
                     },
                     "404": {

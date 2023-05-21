@@ -77,7 +77,7 @@ router.delete('/products/:id', async (req, res) => {
 
         if (result.rowCount >= 1) {
             // return a success response if one row was deleted
-            res.status(204).send('Delete  Product Successfully');
+            res.status(200).send('Delete  Product Successfully');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Product not found' });
