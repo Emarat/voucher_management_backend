@@ -51,7 +51,7 @@ router.route('/accounts')
     })
     .get(async (req, res) => {
         try {
-            const query = 'SELECT accounts.account_id, accounts.status, accounts.parent, accounts.account_name, trim(account_type.account_type_name) as account_type_name, trim(account_detail_type.account_detail_name) as account_detail_type_name, accounts.init_bal_cash, accounts.init_bal_bank, accounts.description FROM accounts LEFT JOIN account_type on accounts.account_type_id = account_type.account_type_id LEFT JOIN account_detail_type on accounts.account_details_type_id = account_detail_type.account_detail_type_id ';
+            const query = 'SELECT accounts.account_id, accounts.status, accounts.parent, accounts.account_name, trim(account_type.account_type_name) as account_type_name, trim(account_detail_type.account_detail_name) as account_detail_type_name, accounts.init_bal_cash, accounts.init_bal_bank,accounts.description,parent_account.account_name as parent_name FROM accounts LEFT JOIN account_type  ON accounts.account_type_id = account_type.account_type_id LEFT JOIN account_detail_type  ON accounts.account_details_type_id = account_detail_type.account_detail_type_id LEFT JOIN accounts as parent_account ON accounts.parent = parent_account.account_id'
 
             const results = await pool.query(query);
             res.json(results.rows);
