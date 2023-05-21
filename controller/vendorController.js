@@ -14,12 +14,19 @@ router.route('/vendor')
         try {
             const { vendor_name, vendor_type, vendor_contact, vendor_number, status } = req.body;
 
-            // Inserting data into PostgreSQL database
-            const query =
-                'INSERT INTO vendor (vendor_name, vendor_type, vendor_contact, vendor_number, status) VALUES ($1, $2, $3, $4, $5)';
-            await pool.query(query, [vendor_name, vendor_type, vendor_contact, vendor_number, status]);
+            // Checking if vendor already exists in PostgreSQL database
+            const selectQuery = 'SELECT * FROM vendor WHERE vendor_name = $1 AND vendor_type = $2 AND vendor_contact = $3 AND vendor_number = $4';
+            const result = await pool.query(selectQuery, [vendor_name, vendor_type, vendor_contact, vendor_number]);
 
-            res.status(201).send('Vendor Added successfully!');
+            if (result.rows.length > 0) {
+                return res.status(400).send('Vendor already exists!');
+            }
+
+            // Inserting data into PostgreSQL database
+            const insertQuery = 'INSERT INTO vendor (vendor_name, vendor_type, vendor_contact, vendor_number, status) VALUES ($1, $2, $3, $4, $5)';
+            await pool.query(insertQuery, [vendor_name, vendor_type, vendor_contact, vendor_number, status]);
+
+            res.status(201).send('Vendor added successfully!');
         } catch (err) {
             console.error(err);
             res.sendStatus(500);

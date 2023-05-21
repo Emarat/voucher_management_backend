@@ -126,6 +126,21 @@ router.delete('/customers/:id', async (req, res) => {
 });
 
 
+//get customer type
+//route
+router.route('/customerType')
+    .get(async (req, res) => {
+        try {
+            const query = 'SELECT * FROM customer_type';
+            const results = await pool.query(query);
+            res.json(results.rows);
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(500);
+        }
+    })
+
+
 
 module.exports = router;
 

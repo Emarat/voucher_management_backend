@@ -329,6 +329,9 @@
                     "201": {
                         "description": "Category Added successfully!"
                     },
+                    "400": {
+                        "description": "Category already exists!"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -690,6 +693,29 @@
                 }
             }
         },
+        "/customerType": {
+            "get": {
+                "summary": "Get all customer types",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerType"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/products": {
             "post": {
                 "summary": "Create a new product",
@@ -943,6 +969,9 @@
                 "responses": {
                     "201": {
                         "description": "Vendor Added successfully!"
+                    },
+                    "400": {
+                        "description": "Vendor already exists!"
                     },
                     "500": {
                         "description": "Server error"
@@ -1963,6 +1992,17 @@
                     "userId": {
                         "type": "string",
                         "description": "User ID"
+                    }
+                }
+            },
+            "CustomerType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
                     }
                 }
             }
