@@ -149,6 +149,21 @@ router.delete('/accounts', async (req, res) => {
 });
 
 
+//get parents
+
+router.get('/parent', async (req, res) => {
+    try {
+        const query = 'SELECT account_id, account_name FROM accounts';
+        const results = await pool.query(query);
+        res.json(results.rows);
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+
+
 
 
 

@@ -1394,6 +1394,37 @@
                     }
                 }
             }
+        },
+        "/parent": {
+            "get": {
+                "summary": "Get parent accounts",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "account_id": {
+                                                "type": "integer"
+                                            },
+                                            "account_name": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2002,6 +2033,17 @@
                         "type": "integer"
                     },
                     "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ParentAccount": {
+                "type": "object",
+                "properties": {
+                    "account_id": {
+                        "type": "integer"
+                    },
+                    "account_name": {
                         "type": "string"
                     }
                 }
