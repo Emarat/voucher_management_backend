@@ -1464,6 +1464,29 @@
                     }
                 }
             }
+        },
+        "/vendorType": {
+            "get": {
+                "summary": "Get vendor types",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/VendorType"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2066,6 +2089,17 @@
                     "req_id",
                     "comments"
                 ]
+            },
+            "VendorType": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
             }
         }
     }

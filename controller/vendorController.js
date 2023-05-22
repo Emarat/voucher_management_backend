@@ -126,6 +126,17 @@ router.delete('/vendors', async (req, res) => {
     }
 });
 
+router.get('/vendorType', async (req, res) => {
+    try {
+        const query = 'SELECT * FROM vendor_type';
+        const results = await pool.query(query);
+        res.json(results.rows);
+    } catch (err) {
+        console.error(err);
+        res.sendStatus(500);
+    }
+})
+
 
 module.exports = router;
 
