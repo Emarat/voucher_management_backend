@@ -1956,9 +1956,6 @@
                 "properties": {
                     "status_id": {
                         "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
                     }
                 }
             },

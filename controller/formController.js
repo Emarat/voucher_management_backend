@@ -105,12 +105,12 @@ router.post('/reqStatus', async (req, res) => {
 //status
 router.post('/status', async (req, res) => {
     try {
-        const { status_id, description } = req.body;
+        const { status_id } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO status (status_id, description) VALUES ($1, $2)';
-        await pool.query(query, [status_id, description]);
+            'INSERT INTO status (status_id) VALUES ($1)';
+        await pool.query(query, [status_id]);
 
         res.status(201).send('Requisition Status!');
         console.log(object);
