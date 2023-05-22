@@ -943,7 +943,7 @@
                                         "type": "string"
                                     },
                                     "vendor_type": {
-                                        "type": "string"
+                                        "type": "integer"
                                     },
                                     "vendor_contact": {
                                         "type": "string"

@@ -35,7 +35,7 @@ router.route('/vendor')
     //get vendor data
     .get(async (req, res) => {
         try {
-            const query = 'SELECT v.*, vt.vendor_type_name FROM vendor v INNER JOIN vendor_type vt ON v.vendor_type_id = vt.vendor_type_id';
+            const query = 'SELECT v.*, vt.vendor_type_name FROM vendor v INNER JOIN vendor_type vt ON v.vendor_type = vt.vendor_type_id';
             const results = await pool.query(query);
             res.json(results.rows);
         } catch (err) {
