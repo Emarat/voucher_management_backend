@@ -1261,7 +1261,7 @@
                 "summary": "Retrieve all requisition data",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successful response",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1274,7 +1274,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal server error"
                     }
                 }
             }
@@ -1419,6 +1419,45 @@
                                 }
                             }
                         }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/comments": {
+            "post": {
+                "summary": "Submit comments",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "user_id": {
+                                        "type": "string"
+                                    },
+                                    "req_id": {
+                                        "type": "string"
+                                    },
+                                    "comments": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "user_id",
+                                    "req_id",
+                                    "comments"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comments submitted"
                     },
                     "500": {
                         "description": "Internal server error"
@@ -1927,69 +1966,39 @@
                 "type": "object",
                 "properties": {
                     "requisition_id": {
-                        "type": "string"
+                        "type": "integer"
                     },
-                    "name": {
-                        "type": "string"
+                    "requisition_details_data": {
+                        "$ref": "#/components/schemas/RequisitionDetailsData"
                     },
-                    "customer_id": {
-                        "type": "string"
+                    "requisition_file_details": {
+                        "$ref": "#/components/schemas/RequisitionFileDetails"
                     },
-                    "project_id": {
-                        "type": "string"
+                    "requisition_history": {
+                        "$ref": "#/components/schemas/RequisitionHistory"
                     },
-                    "supplier_id": {
-                        "type": "string"
-                    },
-                    "total_amount": {
-                        "type": "number"
-                    },
-                    "requisition_details_id": {
-                        "type": "string"
-                    },
-                    "item_category_id": {
-                        "type": "string"
-                    },
-                    "item_name": {
-                        "type": "string"
-                    },
-                    "uom": {
-                        "type": "string"
-                    },
-                    "qty": {
-                        "type": "number"
-                    },
-                    "unit_price": {
-                        "type": "number"
-                    },
-                    "requisition_file_id": {
-                        "type": "string"
-                    },
-                    "file_url": {
-                        "type": "string"
-                    },
-                    "history_id": {
-                        "type": "string"
-                    },
-                    "action_done_by": {
-                        "type": "string"
-                    },
-                    "action_status_id": {
-                        "type": "string"
+                    "requisition_status": {
+                        "$ref": "#/components/schemas/RequisitionStatus"
                     },
                     "comments": {
-                        "type": "string"
-                    },
-                    "requisition_status_id": {
-                        "type": "string"
-                    },
-                    "status_id": {
-                        "type": "string"
-                    },
-                    "assigned_to": {
-                        "type": "string"
+                        "$ref": "#/components/schemas/Comments"
                     }
                 }
+            },
+            "RequisitionDetailsData": {
+                "type": "object"
+            },
+            "RequisitionFileDetails": {
+                "type": "object"
+            },
+            "RequisitionHistory": {
+                "type": "object"
+            },
+            "RequisitionStatus": {
+                "type": "object"
+            },
+            "Comments": {
+                "type": "object"
             },
             "ProcessInstance": {
                 "type": "object",
@@ -2047,6 +2056,25 @@
                         "type": "string"
                     }
                 }
+            },
+            "Comment": {
+                "type": "object",
+                "properties": {
+                    "user_id": {
+                        "type": "string"
+                    },
+                    "req_id": {
+                        "type": "string"
+                    },
+                    "comments": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "user_id",
+                    "req_id",
+                    "comments"
+                ]
             }
         }
     }

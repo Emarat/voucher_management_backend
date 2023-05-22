@@ -120,22 +120,33 @@ router.post('/status', async (req, res) => {
     }
 });
 
+//post comments
+router.post('/comments', async (req, res) => {
+    try {
+        const { user_id, req_id, comments } = req.body;
+        const query = 'INSERT INTO comments (user_id, req_id, comments) VALUES ($1, $2, $3)';
+        await pool.query(query, [user_id, req_id, comments]);
+        res.status(201).send('Commments Submitted!');
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+});
+
 
 
 router.get('/allData', async (req, res) => {
     try {
         // Query to retrieve all requisition data
-        const query = `SELECT * FROM
-                        requisition_master_data,
-                        requisition_details_data,
-                        requisition_file_details,
-                        requisition_history,
-                        requisition_status
-                       WHERE 
-                        requisition_master_data.requisition_id = requisition_details_data.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_file_details.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_history.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_status.requisition_master_id`;
+        const query = `
+        SELECT *
+        FROM requisition_master_data
+        INNER JOIN requisition_details_data ON requisition_master_data.requisition_id = requisition_details_data.requisition_master_id
+        INNER JOIN requisition_file_details ON requisition_master_data.requisition_id = requisition_file_details.requisition_master_id
+        INNER JOIN requisition_history ON requisition_master_data.requisition_id = requisition_history.requisition_master_id
+        INNER JOIN requisition_status ON requisition_master_data.requisition_id = requisition_status.requisition_master_id
+        LEFT JOIN comments ON requisition_master_data.requisition_id = comments.req_id
+      `;
 
         const result = await pool.query(query);
         res.send(result.rows); // Send the data as a response
