@@ -68,12 +68,12 @@ router.post('/fileDetails', async (req, res) => {
 //requisition_history
 router.post('/reqHistory', async (req, res) => {
     try {
-        const { history_id, requisition_master_id, action_done_by, action_status_id, comments } = req.body;
+        const { history_id, requisition_master_id, action_done_by, action_status_id } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO requisition_history (history_id, requisition_master_id, action_done_by, action_status_id, comments) VALUES ($1, $2, $3, $4, $5 )';
-        await pool.query(query, [history_id, requisition_master_id, action_done_by, action_status_id, comments]);
+            'INSERT INTO requisition_history (history_id, requisition_master_id, action_done_by, action_status_id) VALUES ($1, $2, $3, $4)';
+        await pool.query(query, [history_id, requisition_master_id, action_done_by, action_status_id]);
 
         res.status(201).send('Requisition History!');
         console.log(object);
@@ -86,12 +86,12 @@ router.post('/reqHistory', async (req, res) => {
 //requisition_status
 router.post('/reqStatus', async (req, res) => {
     try {
-        const { requisition_status_id, requisition_master_id, status_id, assigned_to, comments } = req.body;
+        const { requisition_status_id, requisition_master_id, status_id, assigned_to } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO requisition_status (requisition_status_id, requisition_master_id, status_id, assigned_to, comments) VALUES ($1, $2, $3, $4, $5 )';
-        await pool.query(query, [requisition_status_id, requisition_master_id, status_id, assigned_to, comments]);
+            'INSERT INTO requisition_status (requisition_status_id, requisition_master_id, status_id, assigned_to) VALUES ($1, $2, $3, $4)';
+        await pool.query(query, [requisition_status_id, requisition_master_id, status_id, assigned_to]);
 
         res.status(201).send('Requisition History!');
         console.log(object);

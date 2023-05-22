@@ -1925,9 +1925,6 @@
                     },
                     "action_status_id": {
                         "type": "string"
-                    },
-                    "comments": {
-                        "type": "string"
                     }
                 }
             },
@@ -1944,9 +1941,6 @@
                         "type": "string"
                     },
                     "assigned_to": {
-                        "type": "string"
-                    },
-                    "comments": {
                         "type": "string"
                     }
                 }
