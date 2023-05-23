@@ -90,7 +90,7 @@ router.get('/accounts/:id', async (req, res) => {
 
     // Querying PostgreSQL database for the account with the specified ID
     const query =
-      'SELECT accounts.*, account_type.account_type_name FROM accounts JOIN account_type ON accounts.account_type_id = account_type.account_type_id WHERE account_id = $1';
+      'SELECT accounts.*, account_type.account_type_name, account_detail_type.account_detail_name FROM accounts JOIN account_type ON accounts.account_type_id = account_type.account_type_id JOIN account_detail_type ON accounts.account_detail_type_id = account_detail_type.account_detail_type_id WHERE account_id = $1';
     const result = await pool.query(query, [account_id]);
 
     // Sending response with the account details
