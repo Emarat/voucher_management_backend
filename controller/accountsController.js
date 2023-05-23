@@ -72,7 +72,7 @@ router
   .get(async (req, res) => {
     try {
       const query =
-        'SELECT accounts.account_id, accounts.status, accounts.parent, accounts.account_name, trim(account_type.account_type_name) as account_type_name, trim(account_detail_type.account_detail_name) as account_detail_type_name, accounts.init_bal_cash, accounts.init_bal_bank, accounts.description FROM accounts LEFT JOIN account_type on accounts.account_type_id = account_type.account_type_id LEFT JOIN account_detail_type on accounts.account_details_type_id = account_detail_type.account_detail_type_id ';
+        "SELECT accounts.account_id, accounts.status, accounts.parent, accounts.account_name, TRIM(account_type.account_type_name) AS account_type_name, TRIM(account_detail_type.account_detail_name) AS account_detail_type_name, accounts.init_bal_cash, accounts.init_bal_bank, accounts.description, parent_account.account_name AS parent_name FROM accounts LEFT JOIN account_type ON accounts.account_type_id = account_type.account_type_id LEFT JOIN account_detail_type ON accounts.account_details_type_id = account_detail_type.account_detail_type_id  LEFT JOIN accounts AS parent_account ON accounts.parent = parent_account.account_id WHERE accounts.account_name <> 'Root' ";
 
       const results = await pool.query(query);
       res.json(results.rows);
@@ -83,15 +83,18 @@ router
   });
 
 //get accounts data by id
-//get accounts data by id
 router.get('/accounts/:id', async (req, res) => {
   try {
     // Extracting account ID from request parameters
     const account_id = req.params.id;
 
     // Querying PostgreSQL database for the account with the specified ID
-    const query =
-      'SELECT accounts.*, parent.account_name AS parent_name FROM accounts LEFT JOIN accounts AS parent ON accounts.parent = parent.account_id WHERE accounts.account_id = $1';
+    const query = `SELECT a.*, at.account_type_name, adt.account_detail_name, p.account_name AS parent_name
+        FROM accounts AS a
+        LEFT JOIN account_type AS at ON a.account_type_id = at.account_type_id
+        LEFT JOIN account_detail_type AS adt ON a.account_details_type_id = adt.account_detail_type_id
+        LEFT JOIN accounts AS p ON a.parent = p.account_id
+        WHERE a.account_id = $1`;
     const result = await pool.query(query, [account_id]);
 
     // Sending response with the account details
@@ -188,6 +191,19 @@ router.delete('/accounts', async (req, res) => {
     // return a server error response if the query fails
     console.error(error);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//get parents
+
+router.get('/parent', async (req, res) => {
+  try {
+    const query = 'SELECT account_id, account_name FROM accounts';
+    const results = await pool.query(query);
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
 });
 

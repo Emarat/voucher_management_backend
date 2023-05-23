@@ -13,12 +13,22 @@ router.route('/products')
         try {
             const { name, category_id, status } = req.body;
 
-            // Inserting data into PostgreSQL database
-            const query =
-                'INSERT INTO products (name, category_id, status) VALUES ($1, $2, $3)';
-            await pool.query(query, [name, category_id, status]);
+            // Check if product already exists
+            const checkQuery =
+                'SELECT * FROM products WHERE name=$1 AND category_id=$2 AND status=$3';
+            const checkResult = await pool.query(checkQuery, [name, category_id, status]);
 
-            res.status(201).send('Product Added successfully!');
+            if (checkResult.rowCount > 0) {
+                // Product already exists, send response
+                res.status(400).send('Product already exists!');
+            } else {
+                // Insert new product into PostgreSQL database
+                const insertQuery =
+                    'INSERT INTO products (name, category_id, status) VALUES ($1, $2, $3)';
+                await pool.query(insertQuery, [name, category_id, status]);
+
+                res.status(201).send('Product added successfully!');
+            }
         } catch (err) {
             console.error(err);
             res.sendStatus(500);
@@ -42,7 +52,7 @@ router.route('/products')
 
             // return a success response if at least one row was deleted
             if (result.rowCount > 0) {
-                res.status(204).send('Delete All Products Successfully');
+                res.status(200).send('Delete All Products Successfully');
             } else {
                 // return a not found response if no rows were deleted
                 res.status(404).json({ error: 'No products found' });
@@ -77,7 +87,7 @@ router.delete('/products/:id', async (req, res) => {
 
         if (result.rowCount >= 1) {
             // return a success response if one row was deleted
-            res.status(204).send('Delete  Product Successfully');
+            res.status(200).send('Delete  Product Successfully');
         } else {
             // return a not found response if no rows were deleted
             res.status(404).json({ error: 'Product not found' });

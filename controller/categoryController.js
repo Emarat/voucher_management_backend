@@ -13,7 +13,13 @@ router.route('/category')
         try {
             const { category_name, status, category_description } = req.body;
 
-            // Inserting data into PostgreSQL database
+            // Check if category already exists in PostgreSQL database
+            const existingCategory = await pool.query('SELECT * FROM category WHERE category_name = $1', [category_name]);
+            if (existingCategory.rows.length > 0) {
+                return res.status(400).send('Category already exists!');
+            }
+
+            // If category doesn't exist, insert data into PostgreSQL database
             const query =
                 'INSERT INTO category (category_name,status, category_description) VALUES ($1, $2, $3)';
             await pool.query(query, [category_name, status, category_description]);

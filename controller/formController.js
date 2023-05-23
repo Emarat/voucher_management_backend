@@ -68,12 +68,12 @@ router.post('/fileDetails', async (req, res) => {
 //requisition_history
 router.post('/reqHistory', async (req, res) => {
     try {
-        const { history_id, requisition_master_id, action_done_by, action_status_id, comments } = req.body;
+        const { history_id, requisition_master_id, action_done_by, action_status_id } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO requisition_history (history_id, requisition_master_id, action_done_by, action_status_id, comments) VALUES ($1, $2, $3, $4, $5 )';
-        await pool.query(query, [history_id, requisition_master_id, action_done_by, action_status_id, comments]);
+            'INSERT INTO requisition_history (history_id, requisition_master_id, action_done_by, action_status_id) VALUES ($1, $2, $3, $4)';
+        await pool.query(query, [history_id, requisition_master_id, action_done_by, action_status_id]);
 
         res.status(201).send('Requisition History!');
         console.log(object);
@@ -86,12 +86,12 @@ router.post('/reqHistory', async (req, res) => {
 //requisition_status
 router.post('/reqStatus', async (req, res) => {
     try {
-        const { requisition_status_id, requisition_master_id, status_id, assigned_to, comments } = req.body;
+        const { requisition_status_id, requisition_master_id, status_id, assigned_to } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO requisition_status (requisition_status_id, requisition_master_id, status_id, assigned_to, comments) VALUES ($1, $2, $3, $4, $5 )';
-        await pool.query(query, [requisition_status_id, requisition_master_id, status_id, assigned_to, comments]);
+            'INSERT INTO requisition_status (requisition_status_id, requisition_master_id, status_id, assigned_to) VALUES ($1, $2, $3, $4)';
+        await pool.query(query, [requisition_status_id, requisition_master_id, status_id, assigned_to]);
 
         res.status(201).send('Requisition History!');
         console.log(object);
@@ -105,12 +105,12 @@ router.post('/reqStatus', async (req, res) => {
 //status
 router.post('/status', async (req, res) => {
     try {
-        const { status_id, description } = req.body;
+        const { status_id } = req.body;
 
         // Inserting data into PostgreSQL database
         const query =
-            'INSERT INTO status (status_id, description) VALUES ($1, $2)';
-        await pool.query(query, [status_id, description]);
+            'INSERT INTO status (status_id) VALUES ($1)';
+        await pool.query(query, [status_id]);
 
         res.status(201).send('Requisition Status!');
         console.log(object);
@@ -120,22 +120,33 @@ router.post('/status', async (req, res) => {
     }
 });
 
+//post comments
+router.post('/comments', async (req, res) => {
+    try {
+        const { user_id, req_id, comments } = req.body;
+        const query = 'INSERT INTO comments (user_id, req_id, comments) VALUES ($1, $2, $3)';
+        await pool.query(query, [user_id, req_id, comments]);
+        res.status(201).send('Commments Submitted!');
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(500);
+    }
+});
+
 
 
 router.get('/allData', async (req, res) => {
     try {
         // Query to retrieve all requisition data
-        const query = `SELECT * FROM
-                        requisition_master_data,
-                        requisition_details_data,
-                        requisition_file_details,
-                        requisition_history,
-                        requisition_status
-                       WHERE 
-                        requisition_master_data.requisition_id = requisition_details_data.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_file_details.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_history.requisition_master_id AND
-                        requisition_master_data.requisition_id = requisition_status.requisition_master_id`;
+        const query = `
+        SELECT *
+        FROM requisition_master_data
+        INNER JOIN requisition_details_data ON requisition_master_data.requisition_id = requisition_details_data.requisition_master_id
+        INNER JOIN requisition_file_details ON requisition_master_data.requisition_id = requisition_file_details.requisition_master_id
+        INNER JOIN requisition_history ON requisition_master_data.requisition_id = requisition_history.requisition_master_id
+        INNER JOIN requisition_status ON requisition_master_data.requisition_id = requisition_status.requisition_master_id
+        LEFT JOIN comments ON requisition_master_data.requisition_id = comments.req_id
+      `;
 
         const result = await pool.query(query);
         res.send(result.rows); // Send the data as a response

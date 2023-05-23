@@ -76,10 +76,19 @@ router.route('/customers')
         try {
             const { name, contact, address, type } = req.body;
 
+            // Checking if customer already exists in PostgreSQL database
+            const selectQuery =
+                'SELECT * FROM customers WHERE name = $1 AND contact = $2';
+            const { rows } = await pool.query(selectQuery, [name, contact]);
+
+            if (rows.length > 0) {
+                return res.status(400).send('Customer already exists!');
+            }
+
             // Inserting data into PostgreSQL database
-            const query =
+            const insertQuery =
                 'INSERT INTO customers (name, contact, address, type) VALUES ($1, $2, $3, $4)';
-            await pool.query(query, [name, contact, address, type]);
+            await pool.query(insertQuery, [name, contact, address, type]);
 
             res.status(201).send('Customer created successfully!');
         } catch (err) {
@@ -90,7 +99,7 @@ router.route('/customers')
     .get(async (req, res) => {
         try {
 
-            const query = 'SELECT customers.customer_id, customers.name AS customer_name, customers.contact AS customer_contact, customers.address AS customer_address, customers.type AS customer_type ,projects.name AS project_name, projects.contact AS project_contact, projects.project_id FROM customers INNER JOIN projects ON customers.customer_id = projects.customer_id '
+            const query = 'SELECT customers.customer_id, customers.name AS customer_name, customers.contact AS customer_contact, customers.address AS customer_address, customers.type AS customer_type ,projects.name AS project_name, projects.contact AS project_contact, projects.project_id FROM customers LEFT JOIN projects ON customers.customer_id = projects.customer_id'
             const results = await pool.query(query);
             const customers = convertRes(results.rows);
             res.json(customers);
@@ -115,6 +124,21 @@ router.delete('/customers/:id', async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+
+//get customer type
+//route
+router.route('/customerType')
+    .get(async (req, res) => {
+        try {
+            const query = 'SELECT * FROM customer_type';
+            const results = await pool.query(query);
+            res.json(results.rows);
+        } catch (err) {
+            console.error(err);
+            res.sendStatus(500);
+        }
+    })
 
 
 

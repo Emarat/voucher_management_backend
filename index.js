@@ -13,7 +13,7 @@ const categoryController = require('./controller/categoryController');
 const vendorController = require('./controller/vendorController');
 const uomController = require('./controller/uomController.js');
 const camundaController = require('./controller/camundaController.js');
-// const keycloakCamunda = require('./controller/keycloakCamunda.js');
+const keycloakUsers = require('./controller/keycloakUsers.js');
 const formController = require('./controller/formController.js');
 
 
@@ -32,7 +32,7 @@ app.use('/', categoryController);
 app.use('/', vendorController);
 app.use('/', uomController);
 app.use('/', camundaController);
-// app.use('/', keycloakCamunda);
+app.use('/', keycloakUsers);
 app.use('/', formController);
 
 
