@@ -1245,29 +1245,6 @@
         }
       }
     },
-    "/allData": {
-      "get": {
-        "summary": "Retrieve all requisition data",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RequisitionData"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/start/{key}": {
       "post": {
         "summary": "Start a new process instance",
@@ -1469,6 +1446,51 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/submitRequisition": {
+      "post": {
+        "summary": "Submit Requisition",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RequisitionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Requisition Submitted!"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/allData": {
+      "get": {
+        "summary": "Get all requisition data",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RequisitionData"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -1941,29 +1963,6 @@
           }
         }
       },
-      "RequisitionData": {
-        "type": "object",
-        "properties": {
-          "requisition_id": {
-            "type": "integer"
-          },
-          "requisition_details_data": {
-            "$ref": "#/components/schemas/RequisitionDetailsData"
-          },
-          "requisition_file_details": {
-            "$ref": "#/components/schemas/RequisitionFileDetails"
-          },
-          "requisition_history": {
-            "$ref": "#/components/schemas/RequisitionHistory"
-          },
-          "requisition_status": {
-            "$ref": "#/components/schemas/RequisitionStatus"
-          },
-          "comments": {
-            "$ref": "#/components/schemas/Comments"
-          }
-        }
-      },
       "RequisitionDetailsData": {
         "type": "object"
       },
@@ -1971,9 +1970,6 @@
         "type": "object"
       },
       "RequisitionHistory": {
-        "type": "object"
-      },
-      "RequisitionStatus": {
         "type": "object"
       },
       "Comments": {
@@ -2036,6 +2032,98 @@
           }
         }
       },
+      "VendorType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "RequisitionRequest": {
+        "type": "object",
+        "properties": {
+          "requisition_master_id": {
+            "type": "string"
+          },
+          "req_name": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "supplier_id": {
+            "type": "string"
+          },
+          "total_amount": {
+            "type": "number"
+          },
+          "requisition_type": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequisitionDetail"
+            }
+          },
+          "status": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequisitionStatus"
+            }
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          }
+        }
+      },
+      "RequisitionDetail": {
+        "type": "object",
+        "properties": {
+          "requisition_master_id": {
+            "type": "string"
+          },
+          "item_category_id": {
+            "type": "string"
+          },
+          "item_name": {
+            "type": "string"
+          },
+          "uom": {
+            "type": "string"
+          },
+          "qty": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          }
+        }
+      },
+      "RequisitionStatus": {
+        "type": "object",
+        "properties": {
+          "requisition_master_id": {
+            "type": "string"
+          },
+          "status_id": {
+            "type": "string"
+          },
+          "assigned_to": {
+            "type": "string"
+          }
+        }
+      },
       "Comment": {
         "type": "object",
         "properties": {
@@ -2047,18 +2135,33 @@
           },
           "comments": {
             "type": "string"
+          },
+          "requisition_master_id": {
+            "type": "string"
           }
-        },
-        "required": ["user_id", "req_id", "comments"]
+        }
       },
-      "VendorType": {
+      "RequisitionData": {
         "type": "object",
         "properties": {
-          "id": {
+          "requisition_id": {
             "type": "integer"
           },
-          "name": {
-            "type": "string"
+          "requisition_details": {
+            "type": "object",
+            "properties": {}
+          },
+          "requisition_files": {
+            "type": "object",
+            "properties": {}
+          },
+          "requisition_status": {
+            "type": "object",
+            "properties": {}
+          },
+          "comments": {
+            "type": "object",
+            "properties": {}
           }
         }
       }
