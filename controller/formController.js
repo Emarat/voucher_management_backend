@@ -31,7 +31,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
     const masterDataQuery =
       'INSERT INTO requisition_master_data (requisition_master_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     await pool.query(masterDataQuery, [
-      requisition_master_id,
+      requisition_master_id, // Make sure requisition_master_id is retrieved correctly
       req_name,
       customer_id,
       project_id,
@@ -46,7 +46,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
         'INSERT INTO requisition_details_data (requisition_master_id, item_category_id, item_name, uom, qty, unit_price) VALUES ($1, $2, $3, $4, $5, $6)';
       for (const details of requisitionDetails) {
         await pool.query(detailsQuery, [
-          details.requisition_master_id,
+          requisition_master_id,
           details.item_category_id,
           details.item_name,
           details.uom,
@@ -71,7 +71,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
         'INSERT INTO requisition_status (requisition_master_id, status_id, assigned_to) VALUES ($1, $2, $3)';
       for (const status of requisitionStatus) {
         await pool.query(statusQuery, [
-          status.requisition_master_id,
+          requisition_master_id,
           status.status_id,
           status.assigned_to,
         ]);
@@ -87,7 +87,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
           comment.user_id,
           comment.req_id,
           comment.comments,
-          comment.requisition_master_id,
+          requisition_master_id,
         ]);
       }
     }
@@ -104,13 +104,13 @@ router.get('/allData', async (req, res) => {
   try {
     // Query to retrieve all requisition data
     const query = `
-            SELECT *
-            FROM requisition_master_data
-            INNER JOIN requisition_details_data ON requisition_master_data.requisition_id = requisition_details_data.requisition_master_id
-            INNER JOIN requisition_file_details ON requisition_master_data.requisition_id = requisition_file_details.requisition_master_id
-            INNER JOIN requisition_status ON requisition_master_data.requisition_id = requisition_status.requisition_master_id
-            LEFT JOIN comments ON requisition_master_data.requisition_id = comments.req_id
-        `;
+      SELECT *
+      FROM requisition_master_data
+      INNER JOIN requisition_details_data ON requisition_master_data.requisition_id = requisition_details_data.requisition_master_id
+      INNER JOIN requisition_file_details ON requisition_master_data.requisition_id = requisition_file_details.requisition_master_id
+      INNER JOIN requisition_status ON requisition_master_data.requisition_id = requisition_status.requisition_master_id
+      LEFT JOIN comments ON requisition_master_data.requisition_id = comments.req_id
+    `;
 
     const result = await pool.query(query);
     res.send(result.rows); // Send the data as a response
