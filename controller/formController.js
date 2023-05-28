@@ -9,7 +9,40 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 // Configure multer for file uploads
-const upload = multer({ dest: 'uploads/' }); // Set the destination folder for uploaded files
+// const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Set the destination folder for uploaded files
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const extname = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + extname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedFileTypes = [
+    'image/jpeg',
+    'image/png',
+    'application/pdf',
+    'application/msword',
+  ];
+  if (allowedFileTypes.includes(file.mimetype)) {
+    cb(null, true); // Accept the file
+  } else {
+    cb(
+      new Error(
+        'Invalid file type. Only JPEG, PNG, PDF, and DOC files are allowed.'
+      ),
+      false
+    ); // Reject the file
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 // Submit requisition data
 router.post('/submitRequisition', upload.array('files'), async (req, res) => {
