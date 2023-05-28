@@ -39,7 +39,13 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fieldSize: 10 * 1024 * 1024, // Increase the field value size limit to 10MB
+  },
+});
 
 // Submit requisition data
 router.post('/submitRequisition', upload.array('files'), async (req, res) => {
