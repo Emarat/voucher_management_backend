@@ -9,9 +9,6 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 // Configure multer for file uploads
-// const multer = require('multer');
-const path = require('path');
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/'); // Set the destination folder for uploaded files
