@@ -82,7 +82,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
 
     // Inserting data into requisition_master_data table
     const masterDataQuery =
-      'INSERT INTO requisition_master_data (requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+      'INSERT INTO requisition_master_data (requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type_id) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     await pool.query(masterDataQuery, [
       requisition_id, // Make sure requisition_id is retrieved correctly
       req_name,
@@ -112,6 +112,8 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
     if (req.files || req.files.length > 0) {
       console.log('Uploaded Files:');
       console.log(req.files);
+      const filesQuery =
+        'INSERT INTO requisition_file_details (file_url, requisition_id) VALUES ($1, $2)';
       for (const file of req.files) {
         console.log('File Name:', file.name);
         console.log('File Size:', file.size);
@@ -119,9 +121,7 @@ router.post('/submitRequisition', upload.array('files'), async (req, res) => {
         console.log('File MIME Type:', file.type);
         console.log('--------------------');
 
-        const filesQuery =
-          'INSERT INTO requisition_file_details (file_url, requisition_id) VALUES ($1, $2)';
-        await pool.query(filesQuery, [file_url, requisition_id]);
+        await pool.query(filesQuery, [file.path, requisition_id]);
       }
     }
 
@@ -189,6 +189,18 @@ router.get('/allData', async (req, res) => {
     const requisitionData = result.rows;
 
     res.send(requisitionData); // Send the data as a response
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+router.get('/requisitionType', async (req, res) => {
+  try {
+    const query =
+      'SELECT requisition_type_id, requisition_type_name FROM accounts';
+    const results = await pool.query(query);
+    res.json(results.rows);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
