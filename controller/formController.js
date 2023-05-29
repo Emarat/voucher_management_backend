@@ -198,7 +198,7 @@ router.get('/allData', async (req, res) => {
 router.get('/requisitionType', async (req, res) => {
   try {
     const query =
-      'SELECT requisition_type_id, requisition_type_name FROM accounts';
+      'SELECT requisition_type_id, requisition_type_name FROM requisition_type';
     const results = await pool.query(query);
     res.json(results.rows);
   } catch (err) {
