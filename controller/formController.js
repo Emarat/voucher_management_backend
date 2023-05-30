@@ -181,7 +181,7 @@ router.post('/upload', (req, res) => {
     }
 
     // Insert the file URL into the requisition_file_details table
-    const fileUrl = `http://localhost:3000/uploads/${uniqueFileName}`;
+    const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
     const query = 'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
     const values = [fileUrl];
 
