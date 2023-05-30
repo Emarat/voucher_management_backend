@@ -14,7 +14,11 @@ router.use(
   })
 );
 router.use(bodyParser.json({ limit: '50mb' }));
-router.use(fileUpload());
+router.use(
+  fileUpload({
+    array: true,
+  })
+);
 
 // Submit requisition data
 router.post('/submitRequisition', async (req, res) => {
@@ -164,7 +168,7 @@ router.post('/upload', (req, res) => {
   console.log(file);
 
   // Generate a unique file name or use the original file name
-  const uniqueFileName = `${uuidv4()}-${file.name}`;
+  const uniqueFileName = `${file.name}`;
 
   // Move the file to a designated folder
   const uploadPath = `uploads/${uniqueFileName}`;
@@ -177,7 +181,7 @@ router.post('/upload', (req, res) => {
     }
 
     // Insert the file URL into the requisition_file_details table
-    const fileUrl = `http://localhost:3000/${uploadPath}`;
+    const fileUrl = `http://localhost:3000/uploads/${uniqueFileName}`;
     const query = 'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
     const values = [fileUrl];
 
