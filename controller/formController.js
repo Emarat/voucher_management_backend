@@ -157,46 +157,165 @@ router.get('/requisitionType', async (req, res) => {
   }
 });
 
+//file upload
+
+// router.post('/upload', (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     console.log('Trying to get files after if condition', req.files);
+//     console.log(
+//       'Trying to get files after if condition',
+//       Object.keys(req.files).length
+//     );
+//     return res.status(400).send('No files were uploaded.');
+//   }
+//   console.log('Trying to get files after if condition', req.files);
+//   const fileKeys = Object.keys(req.files);
+
+//   fileKeys.forEach((key, index) => {
+//     const imgFile = req.files[key];
+//     console.log(imgFile);
+
+//     // Generate a unique file name or use the original file name
+//     const uniqueFileName = `${imgFile.name}`;
+
+//     // Move the file to a designated folder
+//     const uploadPath = `uploads/${uniqueFileName}`;
+//     imgFile.mv(uploadPath, (err) => {
+//       if (err) {
+//         console.error(err);
+//         return res
+//           .status(500)
+//           .send(`An error occurred while uploading ${imgFile.name}.`);
+//       }
+
+//       // Insert the file URL into the requisition_file_details table
+//       const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
+//       const query =
+//         'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
+//       const values = [fileUrl];
+
+//       pool
+//         .query(query, values)
+//         .then(() => {
+//           if (index === fileKeys.length - 1) {
+//             res.send('Files uploaded and details stored successfully.');
+//           }
+//         })
+//         .catch((err) => {
+//           console.error(err);
+//           res
+//             .status(500)
+//             .send(
+//               `An error occurred while storing the details of ${file.name}.`
+//             );
+//         });
+//     });
+//   });
+// });
+
+// router.post('/upload', (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
+//     return res.status(400).send('No files were uploaded.');
+//   }
+
+//   // Get the uploaded file from the request
+//   const file = req.files.file;
+
+//   console.log(file);
+
+//   // Generate a unique file name or use the original file name
+//   const uniqueFileName = `${file.name}`;
+
+//   // Move the file to a designated folder
+//   const uploadPath = `uploads/${uniqueFileName}`;
+//   file.mv(uploadPath, (err) => {
+//     if (err) {
+//       console.error(err);
+//       return res
+//         .status(500)
+//         .send('An error occurred while uploading the file.');
+//     }
+
+//     // Insert the file URL into the requisition_file_details table
+//     const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
+//     const query = 'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
+//     const values = [fileUrl];
+
+//     pool
+//       .query(query, values)
+//       .then(() => {
+//         res.send('File uploaded and details stored successfully.');
+//       })
+//       .catch((err) => {
+//         console.error(err);
+//         res
+//           .status(500)
+//           .send('An error occurred while storing the file details.');
+//       });
+//   });
+// });
+
 router.post('/upload', (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0 || !req.files.file) {
+  if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
 
-  // Get the uploaded file from the request
-  const file = req.files.file;
+  // Get the uploaded files from the request
+  const fileKeys = Object.keys(req.files);
 
-  console.log(file);
+  // Move each file to the designated folder
+  const uploadPromises = fileKeys.map((fileKey) => {
+    const files = req.files[fileKey];
 
-  // Generate a unique file name or use the original file name
-  const uniqueFileName = `${file.name}`;
-
-  // Move the file to a designated folder
-  const uploadPath = `uploads/${uniqueFileName}`;
-  file.mv(uploadPath, (err) => {
-    if (err) {
-      console.error(err);
-      return res
-        .status(500)
-        .send('An error occurred while uploading the file.');
+    // Check if the files are valid
+    if (!files || !Array.isArray(files)) {
+      return Promise.reject('Invalid files.');
     }
 
-    // Insert the file URL into the requisition_file_details table
-    const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
-    const query = 'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
-    const values = [fileUrl];
+    // Move each file to the designated folder
+    const fileUploadPromises = files.map((file) => {
+      if (!file || !file.name) {
+        return Promise.reject('Invalid file.');
+      }
 
-    pool
-      .query(query, values)
-      .then(() => {
-        res.send('File uploaded and details stored successfully.');
-      })
-      .catch((err) => {
-        console.error(err);
-        res
-          .status(500)
-          .send('An error occurred while storing the file details.');
+      const uniqueFileName = `${file.name}`;
+      const uploadPath = `uploads/${uniqueFileName}`;
+
+      return new Promise((resolve, reject) => {
+        file.mv(uploadPath, (err) => {
+          if (err) {
+            console.error(err);
+            reject('An error occurred while uploading the file.');
+          } else {
+            const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
+            const query =
+              'INSERT INTO requisition_file_details (file_url) VALUES ($1)';
+            const values = [fileUrl];
+
+            pool
+              .query(query, values)
+              .then(() => {
+                resolve('File uploaded and details stored successfully.');
+              })
+              .catch((err) => {
+                console.error(err);
+                reject('An error occurred while storing the file details.');
+              });
+          }
+        });
       });
+    });
+
+    return Promise.all(fileUploadPromises);
   });
+
+  Promise.all(uploadPromises)
+    .then((results) => {
+      res.send(results.flat().join('\n')); // Send success messages for all files
+    })
+    .catch((error) => {
+      res.status(500).send(error); // Send the first encountered error message
+    });
 });
 
 module.exports = router;
