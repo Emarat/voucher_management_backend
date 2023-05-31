@@ -265,7 +265,12 @@ router.post('/upload', (req, res) => {
 
   // Move each file to the designated folder
   const uploadPromises = fileKeys.map((fileKey) => {
-    const files = req.files[fileKey];
+    let files = req.files[fileKey];
+
+    // Convert single file to an array with a single element
+    if (!Array.isArray(files)) {
+      files = [files];
+    }
 
     // Check if the files are valid
     if (!files || !Array.isArray(files)) {
