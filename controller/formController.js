@@ -36,19 +36,6 @@ router.post('/submitRequisition', async (req, res) => {
       comments,
     } = req.body;
 
-    // Log the data to the console
-    console.log('Requisition Data:');
-    console.log('Requisition  ID:', requisition_id);
-    console.log('Request Name:', req_name);
-    console.log('Customer ID:', customer_id);
-    console.log('Project ID:', project_id);
-    console.log('Supplier ID:', supplier_id);
-    console.log('Total Amount:', total_amount);
-    console.log('Requisition Type:', requisition_type);
-    console.log('Requisition Details:', requisitionDetails);
-    console.log('Requisition Status:', requisitionStatus);
-    console.log('Comments:', comments);
-
     // Inserting data into requisition_master_data table
     const masterDataQuery =
       'INSERT INTO requisition_master_data (requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type_id) VALUES ($1, $2, $3, $4, $5, $6, $7)';
@@ -100,57 +87,6 @@ router.post('/submitRequisition', async (req, res) => {
     }
 
     res.status(201).send('Requisition Submitted!');
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
-
-// Retrieve all requisition data
-router.get('/allData', async (req, res) => {
-  try {
-    // Query to retrieve all requisition data with distinct rows
-    const query = `
-      SELECT DISTINCT
-        requisition_master_data.requisition_master_id,
-        requisition_master_data.req_name,
-        requisition_master_data.customer_id,
-        requisition_master_data.project_id,
-        requisition_master_data.supplier_id,
-        requisition_master_data.total_amount,
-        requisition_master_data.requisition_type,
-        requisition_details_data.item_category_id,
-        requisition_details_data.item_name,
-        requisition_details_data.uom,
-        requisition_details_data.qty,
-        requisition_details_data.unit_price,
-        requisition_status.status_id,
-        requisition_status.assigned_to,
-        comments.user_id,
-        comments.req_id,
-        comments.comments
-      FROM requisition_master_data
-      LEFT JOIN requisition_details_data ON requisition_master_data.requisition_master_id = requisition_details_data.requisition_master_id
-      LEFT JOIN requisition_status ON requisition_master_data.requisition_master_id = requisition_status.requisition_master_id
-      LEFT JOIN comments ON requisition_master_data.requisition_master_id = comments.requisition_master_id
-    `;
-
-    const result = await pool.query(query);
-    const requisitionData = result.rows;
-
-    res.send(requisitionData); // Send the data as a response
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
-
-router.get('/requisitionType', async (req, res) => {
-  try {
-    const query =
-      'SELECT requisition_type_id, requisition_type_name FROM requisition_type';
-    const results = await pool.query(query);
-    res.json(results.rows);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
@@ -224,6 +160,41 @@ router.post('/upload', (req, res) => {
     .catch((error) => {
       res.status(500).send(error); // Send the first encountered error message
     });
+});
+
+//requisitionType
+router.get('/requisitionType', async (req, res) => {
+  try {
+    const query =
+      'SELECT requisition_type_id, requisition_type_name FROM requisition_type';
+    const results = await pool.query(query);
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+// Get all tables data
+router.get('/getAllData', async (req, res) => {
+  try {
+    const getDataQuery = `
+    SELECT *
+    FROM requisition_master_data AS master
+    LEFT JOIN requisition_details_data AS details ON master.requisition_master_id = details.requisition_master_id
+    LEFT JOIN requisition_status AS status ON master.requisition_master_id = status.requisition_master_id
+    LEFT JOIN comments ON master.requisition_master_id = comments.requisition_master_id
+    LEFT JOIN requisition_file_details AS files ON master.requisition_master_id = files.requisition_master_id
+  `;
+
+    const result = await pool.query(getDataQuery);
+    const data = result.rows;
+
+    res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 });
 
 module.exports = router;
