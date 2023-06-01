@@ -122,7 +122,7 @@ router.post('/upload', (req, res) => {
         return Promise.reject('Invalid file.');
       }
 
-      const uniqueFileName = `${uuidv4}${file.name}`;
+      const uniqueFileName = `${file.name}`;
       const uploadPath = `uploads/${uniqueFileName}`;
 
       return new Promise((resolve, reject) => {
