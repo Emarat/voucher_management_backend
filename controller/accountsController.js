@@ -49,7 +49,6 @@ router
         description,
       } = req.body;
 
-      // Inserting data into PostgreSQL database
       const query =
         'INSERT INTO accounts (  account_name, parent, account_type_id, account_details_type_id, init_bal_cash, init_bal_bank, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
       await pool.query(query, [
@@ -85,10 +84,8 @@ router
 //get accounts data by id
 router.get('/accounts/:id', async (req, res) => {
   try {
-    // Extracting account ID from request parameters
     const account_id = req.params.id;
 
-    // Querying PostgreSQL database for the account with the specified ID
     const query = `SELECT a.*, at.account_type_name, adt.account_detail_name, p.account_name AS parent_name
         FROM accounts AS a
         LEFT JOIN account_type AS at ON a.account_type_id = at.account_type_id
@@ -97,7 +94,6 @@ router.get('/accounts/:id', async (req, res) => {
         WHERE a.account_id = $1`;
     const result = await pool.query(query, [account_id]);
 
-    // Sending response with the account details
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
     } else {
@@ -124,7 +120,6 @@ router.patch('/accounts/:id', async (req, res) => {
     } = req.body;
     const account_id = req.params.id;
 
-    // Updating data in PostgreSQL database
     const query =
       'UPDATE accounts SET account_name=$1, parent=$2, account_type_id=$3, account_details_type_id=$4, init_bal_cash=$5, init_bal_bank=$6, description=$7, status=$8 WHERE account_id=$9';
     await pool.query(query, [
@@ -151,7 +146,6 @@ router.delete('/accounts/:id', async (req, res) => {
   try {
     const account_id = req.params.id;
 
-    // Deleting data from PostgreSQL database
     const query = 'DELETE FROM accounts WHERE account_id=$1';
     await pool.query(query, [account_id]);
 
@@ -169,7 +163,6 @@ router.delete('/accounts', async (req, res) => {
   try {
     let deletedCount = 0;
     for (const id of accountId) {
-      // execute the PostgreSQL query to delete the product by ID
       const result = await pool.query(
         'DELETE FROM accounts WHERE account_id = $1',
         [id]
@@ -181,14 +174,11 @@ router.delete('/accounts', async (req, res) => {
     }
 
     if (deletedCount > 0) {
-      // return a success response if at least one row was deleted
       res.status(200).send('Accounts deleted successfully!');
     } else {
-      // return a not found response if no rows were deleted
       res.status(404).json({ error: 'Accounts not found' });
     }
   } catch (error) {
-    // return a server error response if the query fails
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }

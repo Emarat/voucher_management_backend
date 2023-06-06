@@ -40,7 +40,7 @@ router.post('/submitRequisition', async (req, res) => {
     const masterDataQuery =
       'INSERT INTO requisition_master_data (requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type_id) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     await pool.query(masterDataQuery, [
-      requisition_id, // Make sure requisition_id is retrieved correctly
+      requisition_id,
       req_name,
       customer_id,
       project_id,
@@ -99,24 +99,19 @@ router.post('/upload', (req, res) => {
     return res.status(400).send('No files were uploaded.');
   }
 
-  // Get the uploaded files from the request
   const fileKeys = Object.keys(req.files);
 
-  // Move each file to the designated folder
   const uploadPromises = fileKeys.map((fileKey) => {
     let files = req.files[fileKey];
 
-    // Convert single file to an array with a single element
     if (!Array.isArray(files)) {
       files = [files];
     }
 
-    // Check if the files are valid
     if (!files || !Array.isArray(files)) {
       return Promise.reject('Invalid files.');
     }
 
-    // Move each file to the designated folder
     const fileUploadPromises = files.map((file) => {
       if (!file || !file.name) {
         return Promise.reject('Invalid file.');
@@ -155,10 +150,10 @@ router.post('/upload', (req, res) => {
 
   Promise.all(uploadPromises)
     .then((results) => {
-      res.send(results.flat().join('\n')); // Send success messages for all files
+      res.send(results.flat().join('\n'));
     })
     .catch((error) => {
-      res.status(500).send(error); // Send the first encountered error message
+      res.status(500).send(error);
     });
 });
 
