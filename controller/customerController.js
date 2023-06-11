@@ -154,4 +154,21 @@ router.get('/project-menu-list', async (req, res) => {
   }
 });
 
+//specific projects by user id
+router.get('/project-menu-list/:id', async (req, res) => {
+  try {
+    const customer_id = req.params.id;
+    const query =
+      'SELECT name , project_id FROM projects WHERE customer_id = $1';
+    const result = await pool.query(query, [customer_id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;
