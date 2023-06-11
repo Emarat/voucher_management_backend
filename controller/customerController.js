@@ -130,4 +130,28 @@ router.route('/customerType').get(async (req, res) => {
   }
 });
 
+//customer id, name
+router.get('/customer-menu-list', async (req, res) => {
+  try {
+    const query = 'SELECT name, customer_id FROM customers';
+    const results = await pool.query(query);
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+//project id, name
+router.get('/project-menu-list', async (req, res) => {
+  try {
+    const query = 'SELECT name, project_id FROM projects';
+    const results = await pool.query(query);
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;
