@@ -179,14 +179,49 @@ router.get('/requisitionType', async (req, res) => {
 router.get('/getAllData', async (req, res) => {
   try {
     const getDataQuery = `
-    SELECT master.requisition_master_id, master.requisition_type_id, master.project_id, master.requisition_id, master.req_name, master.supplier_id, master.total_amount, master.created_at, details.uom,details.unit_price, status.status_id,status.status_id, status.assigned_to, comments.user_id,comments.req_id, comments.comments, files.file_url, customers.name, vendor.vendor_name
-FROM requisition_master_data AS master
-LEFT JOIN requisition_details_data AS details ON master.requisition_master_id = details.requisition_master_id
-LEFT JOIN requisition_status AS status ON master.requisition_master_id = status.requisition_master_id
-LEFT JOIN comments ON master.requisition_master_id = comments.requisition_master_id
-LEFT JOIN requisition_file_details AS files ON master.requisition_master_id = files.requisition_master_id
-LEFT JOIN customers ON master.customer_id = customers.customer_id
-LEFT JOIN vendor ON master.supplier_id = vendor.vendor_id
+    SELECT DISTINCT
+    master.requisition_master_id,
+    master.requisition_type_id,
+    master.project_id,
+    master.requisition_id,
+    master.req_name,
+    master.supplier_id,
+    master.total_amount,
+    master.created_at,
+    details.uom,
+    details.unit_price,
+    rs.status_id,
+    rs.assigned_to, 
+    comments.user_id,
+    comments.req_id,
+    comments.comments,
+    files.file_url,
+    customers.name,
+    vendor.vendor_name,
+    status.status_name
+  FROM
+    requisition_master_data AS master
+  LEFT JOIN
+    requisition_details_data AS details
+    ON master.requisition_master_id = details.requisition_master_id
+  LEFT JOIN
+    requisition_status AS rs 
+    ON master.requisition_master_id = rs.requisition_master_id
+  LEFT JOIN
+    comments
+    ON master.requisition_master_id = comments.requisition_master_id
+  LEFT JOIN
+    requisition_file_details AS files
+    ON master.requisition_master_id = files.requisition_master_id
+  LEFT JOIN
+    customers
+    ON master.customer_id = customers.customer_id
+  LEFT JOIN
+    vendor
+    ON master.supplier_id = vendor.vendor_id
+  LEFT JOIN
+    status
+    ON rs.status_id = status.status_id;
 
   `;
 
