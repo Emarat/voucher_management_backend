@@ -4,7 +4,7 @@ const { getKeycloakInstance } = require('../config/keycloak-config');
 const bodyParser = require('body-parser');
 
 const keycloak = getKeycloakInstance();
-console.log(keycloak);
+// console.log(keycloak);
 
 // Set up middleware
 router.use(keycloak.middleware());
