@@ -19,9 +19,9 @@ router.post('/login', (req, res) => {
     .then((grant) => {
       req.kauth.grant = grant;
       const user = grant.access_token.content;
-      const realmRoles = grant.access_token.content.realm_access.roles;
+      const realmRoles = grant.access_token.content.realm_access?.roles;
       const resourceRoles = grant.access_token.content.resource_access;
-      const specificRoles = resourceRoles.campaign_clients.roles;
+      const specificRoles = resourceRoles.campaign_clients?.roles;
       // console.log(user);
       // console.log('realmRoles', realmRoles);
       // console.log('resourceRoles', resourceRoles);
@@ -38,6 +38,7 @@ router.post('/login', (req, res) => {
       return;
     })
     .catch((error) => {
+      console.log(error);
       res.status(401).send('Invalid username or password');
     });
 });
