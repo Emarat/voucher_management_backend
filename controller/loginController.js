@@ -18,7 +18,24 @@ router.post('/login', (req, res) => {
     .obtainDirectly(username, password)
     .then((grant) => {
       req.kauth.grant = grant;
-      res.send('You are logged in!');
+      const user = grant.access_token.content;
+      const realmRoles = grant.access_token.content.realm_access.roles;
+      const resourceRoles = grant.access_token.content.resource_access;
+      const specificRoles = resourceRoles.campaign_clients.roles;
+      // console.log(user);
+      // console.log('realmRoles', realmRoles);
+      // console.log('resourceRoles', resourceRoles);
+      console.log('specificRoles', specificRoles);
+      res.json({
+        message: 'You are logged in!',
+        user: {
+          id: user.sid,
+          name: user.preferred_username,
+          email: user.email,
+          roles: specificRoles,
+        },
+      });
+      return;
     })
     .catch((error) => {
       res.status(401).send('Invalid username or password');
