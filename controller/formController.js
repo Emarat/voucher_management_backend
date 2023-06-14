@@ -57,7 +57,7 @@ router.post('/submitRequisition', async (req, res) => {
     // Inserting data into requisition_details_data table
     if (requisitionDetails && requisitionDetails.length > 0) {
       const detailsQuery =
-        'INSERT INTO requisition_details_data (item_category_id, item_name, uom, qty, unit_price) VALUES ($1, $2, $3, $4, $5)';
+        'INSERT INTO requisition_details_data (item_category_id, item_name, uom, qty, unit_price, amount) VALUES ($1, $2, $3, $4, $5, $6)';
       for (const details of requisitionDetails) {
         await pool.query(detailsQuery, [
           details.item_category_id,
@@ -65,6 +65,7 @@ router.post('/submitRequisition', async (req, res) => {
           details.uom,
           details.qty,
           details.unit_price,
+          details.amount,
         ]);
       }
     }
@@ -176,57 +177,182 @@ router.get('/requisitionType', async (req, res) => {
 });
 
 // Get all tables data
+// router.get('/getAllData', async (req, res) => {
+//   try {
+//     const getDataQuery = `
+//     SELECT DISTINCT
+//     master.requisition_master_id,
+//     master.requisition_type_id,
+//     master.project_id,
+//     master.requisition_id,
+//     master.req_name,
+//     master.supplier_id,
+//     master.total_amount,
+//     master.created_at,
+//     details.uom,
+//     details.unit_price,
+//     details.qty,
+//     details.amount,
+//     rs.status_id,
+//     rs.assigned_to,
+//     comments.user_id,
+//     comments.req_id,
+//     comments.comments,
+//     files.file_url,
+//     customers.name,
+//     vendor.vendor_name,
+//     status.status_name,
+//     category.category_name,
+//     products.name AS product_name
+//   FROM
+//     requisition_master_data AS master
+//   LEFT JOIN
+//     requisition_details_data AS details
+//     ON master.requisition_master_id = details.requisition_master_id
+//   LEFT JOIN
+//     requisition_status AS rs
+//     ON master.requisition_master_id = rs.requisition_master_id
+//   LEFT JOIN
+//     comments
+//     ON master.requisition_master_id = comments.requisition_master_id
+//   LEFT JOIN
+//     requisition_file_details AS files
+//     ON master.requisition_master_id = files.requisition_master_id
+//   LEFT JOIN
+//     customers
+//     ON master.customer_id = customers.customer_id
+//   LEFT JOIN
+//     vendor
+//     ON master.supplier_id = vendor.vendor_id
+//   LEFT JOIN
+//     status
+//     ON rs.status_id = status.status_id
+//   LEFT JOIN
+//     category
+//     ON details.item_category_id = category.category_id
+//   LEFT JOIN
+//     products
+//     ON details.item_name = products.id;
+
+//   `;
+
+//     const result = await pool.query(getDataQuery);
+//     const data = result.rows;
+
+//     res.status(200).json(data);
+//   } catch (err) {
+//     console.error(err);
+//     res.sendStatus(500);
+//   }
+// });
+
 router.get('/getAllData', async (req, res) => {
   try {
     const getDataQuery = `
-    SELECT DISTINCT
-    master.requisition_master_id,
-    master.requisition_type_id,
-    master.project_id,
-    master.requisition_id,
-    master.req_name,
-    master.supplier_id,
-    master.total_amount,
-    master.created_at,
-    details.uom,
-    details.unit_price,
-    rs.status_id,
-    rs.assigned_to, 
-    comments.user_id,
-    comments.req_id,
-    comments.comments,
-    files.file_url,
-    customers.name,
-    vendor.vendor_name,
-    status.status_name
-  FROM
-    requisition_master_data AS master
-  LEFT JOIN
-    requisition_details_data AS details
-    ON master.requisition_master_id = details.requisition_master_id
-  LEFT JOIN
-    requisition_status AS rs 
-    ON master.requisition_master_id = rs.requisition_master_id
-  LEFT JOIN
-    comments
-    ON master.requisition_master_id = comments.requisition_master_id
-  LEFT JOIN
-    requisition_file_details AS files
-    ON master.requisition_master_id = files.requisition_master_id
-  LEFT JOIN
-    customers
-    ON master.customer_id = customers.customer_id
-  LEFT JOIN
-    vendor
-    ON master.supplier_id = vendor.vendor_id
-  LEFT JOIN
-    status
-    ON rs.status_id = status.status_id;
-
-  `;
+    SELECT
+      master.requisition_master_id,
+      master.requisition_type_id,
+      master.project_id,
+      master.requisition_id,
+      master.req_name,
+      master.supplier_id,
+      master.total_amount,
+      master.created_at,
+      rs.status_id,
+      rs.assigned_to, 
+      comments.user_id,
+      comments.req_id,
+      comments.comments,
+      files.file_url,
+      customers.name,
+      vendor.vendor_name,
+      status.status_name,
+      category.category_name,
+      products.name AS product_name,
+      details.qty,
+      details.uom,
+      details.unit_price,
+      details.amount
+    FROM
+      requisition_master_data AS master
+    LEFT JOIN
+      requisition_details_data AS details
+      ON master.requisition_master_id = details.requisition_master_id
+    LEFT JOIN
+      requisition_status AS rs 
+      ON master.requisition_master_id = rs.requisition_master_id
+    LEFT JOIN
+      comments
+      ON master.requisition_master_id = comments.requisition_master_id
+    LEFT JOIN
+      requisition_file_details AS files
+      ON master.requisition_master_id = files.requisition_master_id
+    LEFT JOIN
+      customers
+      ON master.customer_id = customers.customer_id
+    LEFT JOIN
+      vendor
+      ON master.supplier_id = vendor.vendor_id
+    LEFT JOIN
+      status
+      ON rs.status_id = status.status_id
+    LEFT JOIN
+      category
+      ON details.item_category_id = category.category_id
+    LEFT JOIN
+      products
+      ON details.item_name = products.id;
+    `;
 
     const result = await pool.query(getDataQuery);
-    const data = result.rows;
+    const data = result.rows.reduce((acc, row) => {
+      const existingData = acc.find(
+        (item) => item.requisition_master_id === row.requisition_master_id
+      );
+
+      if (existingData) {
+        existingData.descriptions.push({
+          category_name: row.category_name,
+          product_name: row.product_name,
+          qty: row.qty,
+          uom: row.uom,
+          unit_price: row.unit_price,
+          amount: row.amount,
+        });
+      } else {
+        acc.push({
+          requisition_master_id: row.requisition_master_id,
+          requisition_type_id: row.requisition_type_id,
+          project_id: row.project_id,
+          requisition_id: row.requisition_id,
+          req_name: row.req_name,
+          supplier_id: row.supplier_id,
+          total_amount: row.total_amount,
+          created_at: row.created_at,
+          status_id: row.status_id,
+          assigned_to: row.assigned_to,
+          user_id: row.user_id,
+          req_id: row.req_id,
+          comments: row.comments,
+          file_url: row.file_url,
+          name: row.name,
+          vendor_name: row.vendor_name,
+          status_name: row.status_name,
+          descriptions: [
+            {
+              category_name: row.category_name,
+              product_name: row.product_name,
+              qty: row.qty,
+              uom: row.uom,
+              unit_price: row.unit_price,
+              amount: row.amount,
+            },
+          ],
+        });
+      }
+
+      return acc;
+    }, []);
 
     res.status(200).json(data);
   } catch (err) {
