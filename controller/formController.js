@@ -4,8 +4,13 @@ const router = express.Router();
 const pool = require('./../config/db');
 const fileUpload = require('express-fileupload');
 const { v4: uuidv4 } = require('uuid');
+const { getKeycloakInstance } = require('../config/keycloak-config');
+const keycloak = getKeycloakInstance();
 
 // Set up middleware
+//keycloak middleware
+router.use(keycloak.middleware());
+
 router.use(
   bodyParser.urlencoded({
     limit: '50mb',
@@ -171,7 +176,7 @@ router.get('/requisitionType', async (req, res) => {
 });
 
 // Get all tables data
-router.get('/getAllData', async (req, res) => {
+router.get('/getAllData', keycloak.protect('admin'), async (req, res) => {
   try {
     const getDataQuery = `
     SELECT master.requisition_master_id, master.requisition_type_id, master.project_id, master.requisition_id, master.req_name, master.supplier_id, master.total_amount, master.created_at, details.uom,details.unit_price, status.status_id,status.status_id, status.assigned_to, comments.user_id,comments.req_id, comments.comments, files.file_url, customers.name, vendor.vendor_name

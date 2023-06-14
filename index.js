@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
@@ -15,7 +15,6 @@ const uomController = require('./controller/uomController.js');
 const camundaController = require('./controller/camundaController.js');
 const keycloakUsers = require('./controller/keycloakUsers.js');
 const formController = require('./controller/formController.js');
-
 
 //swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -35,12 +34,11 @@ app.use('/', camundaController);
 app.use('/', keycloakUsers);
 app.use('/', formController);
 
-
 app.get('/', function (req, res) {
-    res.send('Server Started');
+  res.send('Server Started');
 });
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
