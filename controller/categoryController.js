@@ -1,7 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const router = express.Router();
-const pool = require('./../config/db');
+// const pool = require('./../config/db');
+const {
+  addCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+  deleteMultipleCategories,
+} = require('../Query/categoryQueries');
 
 // Set up middleware
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -11,116 +19,70 @@ router.use(bodyParser.json());
 router
   .route('/category')
   .post(async (req, res) => {
-    try {
-      const { category_name, status, category_description } = req.body;
+    const { category_name, status, category_description } = req.body;
+    const result = await addCategory(
+      category_name,
+      status,
+      category_description
+    );
 
-      const existingCategory = await pool.query(
-        'SELECT * FROM category WHERE category_name = $1',
-        [category_name]
-      );
-      if (existingCategory.rows.length > 0) {
-        return res.status(400).send('Category already exists!');
-      }
-
-      const query =
-        'INSERT INTO category (category_name,status, category_description) VALUES ($1, $2, $3)';
-      await pool.query(query, [category_name, status, category_description]);
-
-      res.status(201).send('Category Added successfully!');
-    } catch (err) {
-      console.error(err);
-      res.sendStatus(500);
+    if (result.success) {
+      res.status(201).send(result.message);
+    } else {
+      res.status(400).send(result.message);
     }
   })
   .get(async (req, res) => {
-    try {
-      const query = 'SELECT * FROM category';
-      const results = await pool.query(query);
-      res.json(results.rows);
-    } catch (err) {
-      console.error(err);
-      res.sendStatus(500);
-    }
+    const categories = await getAllCategories();
+    res.json(categories);
   });
 
 //get products by using category_id
 router.get('/category/:id', async (req, res) => {
-  try {
-    const categoryId = req.params.id;
-    const query = 'SELECT * FROM category WHERE category_id = $1';
-    const results = await pool.query(query, [categoryId]);
-    res.json(results.rows);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
+  const categoryId = req.params.id;
+  const categories = await getCategoryById(categoryId);
+  res.json(categories);
 });
 
-//update catagory
+//update category
 router.patch('/category/:id', async (req, res) => {
-  try {
-    const categoryId = req.params.id;
-    const { category_name, category_description, status } = req.body;
+  const categoryId = req.params.id;
+  const { category_name, category_description, status } = req.body;
+  const result = await updateCategory(
+    categoryId,
+    category_name,
+    category_description,
+    status
+  );
 
-    const query =
-      'UPDATE category SET category_name=$1, category_description=$2, status=$3 WHERE category_id=$4';
-    await pool.query(query, [
-      category_name,
-      category_description,
-      status,
-      categoryId,
-    ]);
-
-    res.status(200).send('Category Updated successfully!');
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+  if (result.success) {
+    res.status(200).send(result.message);
+  } else {
+    res.status(400).send(result.message);
   }
 });
 
 //delete category by id
 router.delete('/category/:id', async (req, res) => {
-  try {
-    const categoryId = req.params.id;
+  const categoryId = req.params.id;
+  const result = await deleteCategory(categoryId);
 
-    const query = 'DELETE FROM category WHERE category_id=$1';
-    await pool.query(query, [categoryId]);
-
-    res.status(200).send('Category Deleted Successfully!');
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
+  if (result.success) {
+    res.status(200).send(result.message);
+  } else {
+    res.status(400).send(result.message);
   }
 });
 
-//delete multiple products by id
+//delete multiple categories by id
 router.delete('/categories', async (req, res) => {
-  const categoryId = req.body.ids;
-  if (!Array.isArray(categoryId)) {
-    return res.status(400).json({ error: 'Invalid request' });
-  }
+  const categoryIds = req.body.ids;
+  const result = await deleteMultipleCategories(categoryIds);
 
-  try {
-    let deletedCount = 0;
-    for (const id of categoryId) {
-      const result = await pool.query(
-        'DELETE FROM category WHERE category_id = $1',
-        [id]
-      );
-
-      if (result.rowCount >= 1) {
-        deletedCount++;
-      }
-    }
-
-    if (deletedCount > 0) {
-      res.status(200).send('Successfully Deleted!');
-    } else {
-      res.status(404).json({ error: 'Categories not found' });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+  if (result.success) {
+    res.status(200).send(result.message);
+  } else {
+    res.status(400).send(result.message);
   }
 });
 
