@@ -2,7 +2,7 @@ const pool = require('./../config/db');
 
 //requisition master data
 const insertMasterData = async (
-  requisition_master_id,
+  // requisition_master_id,
   requisition_id,
   req_name,
   customer_id,
@@ -12,9 +12,9 @@ const insertMasterData = async (
   requisition_type
 ) => {
   const query =
-    'INSERT INTO requisition_master_data (requisition_master_id, requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
-  await pool.query(query, [
-    requisition_master_id,
+    'INSERT INTO requisition_master_data (requisition_id, req_name, customer_id, project_id, supplier_id, total_amount, requisition_type_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING requisition_master_id';
+  const values = [
+    // requisition_master_id,
     requisition_id,
     req_name,
     customer_id,
@@ -22,7 +22,11 @@ const insertMasterData = async (
     supplier_id,
     total_amount,
     requisition_type,
-  ]);
+  ];
+  const { rows } = await pool.query(query, values);
+  const requisition_master_id = rows[0].requisition_master_id;
+  console.log(requisition_master_id);
+  return requisition_master_id;
 };
 
 //requisition details data
@@ -86,68 +90,63 @@ const getRequisitionTypes = async () => {
 //getAllData
 const getAllData = async () => {
   const getDataQuery = `
-    SELECT DISTINCT
-      master.requisition_master_id,
-      master.requisition_type_id,
-      master.project_id,
-      master.requisition_id,
-      master.req_name,
-      master.supplier_id,
-      master.total_amount,
-      master.created_at,
-      details.uom,
-      details.unit_price,
-      details.qty,
-      details.amount,
-      rs.status_id,
-      rs.assigned_to, 
-      comments.user_id,
-      comments.req_id,
-      comments.comments,
-      files.file_url,
-      customers.name,
-      vendor.vendor_name,
-      status.status_name,
-      category.category_name,
-      products.name AS product_name,
-      requisition_type.requisition_type_name
-    FROM
-      requisition_master_data AS master
-    LEFT JOIN
-      requisition_details_data AS details
-      ON master.requisition_master_id = details.requisition_master_id
-    LEFT JOIN
-      requisition_status AS rs 
-      ON master.requisition_master_id = rs.requisition_master_id
-    LEFT JOIN
-      comments
-      ON master.requisition_master_id = comments.requisition_master_id
-    LEFT JOIN
-      requisition_file_details AS files
-      ON master.requisition_master_id = files.requisition_master_id
-    LEFT JOIN
-      customers
-      ON master.customer_id = customers.customer_id
-    LEFT JOIN
-      vendor
-      ON master.supplier_id = vendor.vendor_id
-    LEFT JOIN
-      status
-      ON rs.status_id = status.status_id
-    LEFT JOIN
-      category
-      ON details.item_category_id = category.category_id
-    LEFT JOIN
-      products
-      ON details.item_name = products.id
-    LEFT JOIN 
-      requisition_type
-      ON master.requisition_type_id = requisition_type.requisition_type_id;
+  SELECT DISTINCT
+  master.requisition_master_id,
+  master.requisition_type_id,
+  master.project_id,
+  master.requisition_id,
+  master.req_name,
+  master.supplier_id,
+  master.total_amount,
+  master.created_at,
+  details.uom,
+  details.unit_price,
+  details.qty,
+  details.amount,
+  rs.status_id,
+  rs.assigned_to, 
+  comments.user_id,
+  comments.req_id,
+  comments.comments,
+  files.file_urls,
+  customers.name,
+  vendor.vendor_name,
+  status.status_name,
+  category.category_name,
+  products.name AS product_name,
+  requisition_type.requisition_type_name
+FROM requisition_master_data AS master
+LEFT JOIN requisition_details_data AS details
+  ON master.requisition_master_id = details.requisition_master_id
+LEFT JOIN requisition_status AS rs 
+  ON master.requisition_master_id = rs.requisition_master_id
+LEFT JOIN comments
+  ON master.requisition_master_id = comments.requisition_master_id
+LEFT JOIN (
+  SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls
+  FROM requisition_file_details
+  GROUP BY requisition_master_id
+) AS files
+  ON master.requisition_master_id = files.requisition_master_id
+LEFT JOIN customers
+  ON master.customer_id = customers.customer_id
+LEFT JOIN vendor
+  ON master.supplier_id = vendor.vendor_id
+LEFT JOIN status
+  ON rs.status_id = status.status_id
+LEFT JOIN category
+  ON details.item_category_id = category.category_id
+LEFT JOIN products
+  ON details.item_name = products.id
+LEFT JOIN requisition_type
+  ON master.requisition_type_id = requisition_type.requisition_type_id;
+
   `;
 
   const result = await pool.query(getDataQuery);
   const rows = result.rows;
   const data = [];
+  console.log('rows', rows);
 
   rows.forEach((row) => {
     const existingData = data.find(
@@ -155,9 +154,16 @@ const getAllData = async () => {
     );
 
     if (existingData) {
-      existingData.comments.push({ comment: row.comments });
-      if (row.file_url) {
-        existingData.file_urls.push({ url: row.file_url });
+      if (!existingData.comments.find((c) => c.comment === row.comments)) {
+        existingData.comments.push({ comment: row.comments });
+      }
+      if (row.file_urls) {
+        const fileUrls = row.file_urls.split(',').map((url) => url.trim());
+        fileUrls.forEach((url) => {
+          if (!existingData.file_urls.find((file) => file.url === url)) {
+            existingData.file_urls.push({ url });
+          }
+        });
       }
     } else {
       const newData = {
@@ -172,7 +178,7 @@ const getAllData = async () => {
         created_at: row.created_at,
         status_id: row.status_id,
         assigned_to: row.assigned_to,
-        comments: [{ comment: row.comments }],
+        comments: [],
         file_urls: [],
         name: row.name,
         vendor_name: row.vendor_name,
@@ -180,8 +186,17 @@ const getAllData = async () => {
         descriptions: [],
       };
 
-      if (row.file_url) {
-        newData.file_urls.push({ url: row.file_url });
+      if (row.comments) {
+        newData.comments.push({ comment: row.comments });
+      }
+
+      if (row.file_urls) {
+        const fileUrls = row.file_urls.split(',').map((url) => url.trim());
+        fileUrls.forEach((url) => {
+          if (!newData.file_urls.find((file) => file.url === url)) {
+            newData.file_urls.push({ url });
+          }
+        });
       }
 
       data.push(newData);

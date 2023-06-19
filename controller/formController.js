@@ -17,7 +17,7 @@ const {
   getAllData,
 } = require('../Query/requisitionFormQuery');
 
-let counter = 1;
+// let counter = 1;
 
 // Set up middleware
 //keycloak middleware
@@ -37,11 +37,11 @@ router.use(
   })
 );
 
-// Submit requisition data
+let returnedData;
 // Submit requisition data
 router.post('/submitRequisition', async (req, res) => {
   try {
-    const requisition_master_id = counter++;
+    // const requisition_master_id = counter++;
     // console.log('master_data_id', requisition_master_id);
     const {
       requisition_id,
@@ -57,8 +57,8 @@ router.post('/submitRequisition', async (req, res) => {
     } = req.body;
 
     // Inserting data into requisition_master_data table
-    await insertMasterData(
-      requisition_master_id,
+    returnedData = await insertMasterData(
+      // requisition_master_id,
       requisition_id,
       req_name,
       customer_id,
@@ -68,11 +68,15 @@ router.post('/submitRequisition', async (req, res) => {
       requisition_type
     );
 
+    console.log('req_id:', returnedData);
+
+    // const id = requisition_master_id;
+
     // Inserting data into requisition_details_data table
     if (requisitionDetails && requisitionDetails.length > 0) {
       for (const details of requisitionDetails) {
         await insertDetails(
-          requisition_master_id,
+          returnedData,
           details.item_category_id,
           details.item_name,
           details.uom,
@@ -86,11 +90,7 @@ router.post('/submitRequisition', async (req, res) => {
     // Inserting data into requisition_status table
     if (requisitionStatus && requisitionStatus.length > 0) {
       for (const status of requisitionStatus) {
-        await insertStatus(
-          requisition_master_id,
-          status.status_id,
-          status.assigned_to
-        );
+        await insertStatus(returnedData, status.status_id, status.assigned_to);
       }
     }
 
@@ -98,7 +98,7 @@ router.post('/submitRequisition', async (req, res) => {
     if (comments && comments.length > 0) {
       for (const comment of comments) {
         await insertComment(
-          requisition_master_id,
+          returnedData,
           comment.user_id,
           comment.req_id,
           comment.comments
@@ -113,11 +113,11 @@ router.post('/submitRequisition', async (req, res) => {
   }
 });
 
-let counters = 1;
+// let counters = 1;
 //file upload
 router.post('/upload', (req, res) => {
-  const requisition_master_id = counters++;
-  console.log('master_data_id', requisition_master_id);
+  // const requisition_master_id = counters++;
+  // console.log('master_data_id', requisition_master_id);
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
@@ -150,7 +150,7 @@ router.post('/upload', (req, res) => {
             reject('An error occurred while uploading the file.');
           } else {
             const fileUrl = `${process.env.BASE_URL}${uniqueFileName}`;
-            insertFileDetails(requisition_master_id, fileUrl)
+            insertFileDetails(returnedData, fileUrl)
               .then(() => {
                 resolve('File uploaded and details stored successfully.');
               })
