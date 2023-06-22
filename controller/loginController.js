@@ -26,8 +26,8 @@ router.post('/login', (req, res) => {
       // console.log(user);
       // console.log('realmRoles', realmRoles);
       // console.log('resourceRoles', resourceRoles);
-      console.log('specificRoles', specificRoles);
-      console.log('token', token);
+      // console.log('specificRoles', specificRoles);
+      // console.log('token', token);
       res.json({
         message: 'You are logged in!',
         user: {
@@ -44,6 +44,20 @@ router.post('/login', (req, res) => {
       console.log(error);
       res.status(401).send('Invalid username or password');
     });
+});
+
+//retrive user info using token
+router.get('/userInfo', keycloak.protect(), (req, res) => {
+  const token = req.kauth.grant.access_token;
+  console.log(token);
+  const user = token.content;
+
+  res.json({
+    id: user.sid,
+    name: user.preferred_username,
+    email: user.email,
+    roles: user.resource_access?.campaign_clients?.roles,
+  });
 });
 
 module.exports = router;
