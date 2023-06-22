@@ -15,6 +15,7 @@ const {
   insertFileDetails,
   getRequisitionTypes,
   getAllData,
+  getSingleData,
 } = require('../Query/requisitionFormQuery');
 
 // let counter = 1;
@@ -68,7 +69,7 @@ router.post('/submitRequisition', async (req, res) => {
       requisition_type
     );
 
-    console.log('req_id:', returnedData);
+    // console.log('req_id:', returnedData);
 
     // const id = requisition_master_id;
 
@@ -257,9 +258,16 @@ router.get('/requisitionType', async (req, res) => {
 // });
 
 router.get('/getAllData', async (req, res) => {
+  const { requisition_id } = req.query;
+
   try {
-    const data = await getAllData();
-    res.status(200).json(data);
+    if (requisition_id) {
+      const data = await getSingleData(requisition_id);
+      res.status(200).json(data);
+    } else {
+      const data = await getAllData();
+      res.status(200).json(data);
+    }
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
