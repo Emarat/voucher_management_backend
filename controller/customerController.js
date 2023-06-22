@@ -119,16 +119,62 @@ router.delete('/customers/:id', async (req, res) => {
 
 //get customer type
 //route
-router.route('/customerType').get(async (req, res) => {
-  try {
-    const query = 'SELECT * FROM customer_type';
-    const results = await pool.query(query);
-    res.json(results.rows);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
+router
+  .route('/customerType')
+  .get(async (req, res) => {
+    try {
+      const query = 'SELECT * FROM customer_type';
+      const results = await pool.query(query);
+      res.json(results.rows);
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
+  })
+  .post(async (req, res) => {
+    try {
+      const { name } = req.body;
+
+      const query =
+        'INSERT INTO customer_type (customer_type_name) VALUES ($1)';
+      const values = [name];
+      await pool.query(query, values);
+
+      res.status(200).send('Customer Type Added Successfully!');
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      const { customer_type_id } = req.body;
+
+      const query = 'DELETE FROM customer_type WHERE customer_type_id = $1';
+      const values = [customer_type_id];
+      await pool.query(query, values);
+
+      res.status(200).send('Customer Type Deleted Successfully!');
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
+  })
+  .patch(async (req, res) => {
+    try {
+      const { customer_type_id, name } = req.body;
+
+      const query =
+        'UPDATE customer_type SET customer_type_name = $1 WHERE customer_type_id = $2';
+      const values = [name, customer_type_id];
+      await pool.query(query, values);
+
+      res.status(200).send('Customer Type Updated Successfully!');
+    } catch (err) {
+      console.error(err);
+      res.sendStatus(500);
+    }
+  });
 
 //customer id, name
 router.get('/customer-menu-list', async (req, res) => {
