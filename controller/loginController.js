@@ -22,10 +22,12 @@ router.post('/login', (req, res) => {
       const realmRoles = grant.access_token.content.realm_access?.roles;
       const resourceRoles = grant.access_token.content.resource_access;
       const specificRoles = resourceRoles.campaign_clients?.roles;
+      const token = req.kauth.grant.access_token;
       // console.log(user);
       // console.log('realmRoles', realmRoles);
       // console.log('resourceRoles', resourceRoles);
       console.log('specificRoles', specificRoles);
+      console.log('token', token);
       res.json({
         message: 'You are logged in!',
         user: {
@@ -34,6 +36,7 @@ router.post('/login', (req, res) => {
           email: user.email,
           roles: specificRoles,
         },
+        token: token.token,
       });
       return;
     })
