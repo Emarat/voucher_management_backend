@@ -233,57 +233,58 @@ LEFT JOIN requisition_type
 //get sigle data based on requisition id
 const getSingleData = async (requisitionId) => {
   const getDataQuery = `
-  SELECT DISTINCT
-  master.requisition_master_id,
-  master.requisition_type_id,
-  master.project_id,
-  master.requisition_id,
-  master.req_name,
-  master.supplier_id,
-  master.total_amount,
-  master.created_at,
-  details.uom,
-  details.unit_price,
-  details.qty,
-  details.amount,
-  rs.status_id,
-  rs.assigned_to, 
-  comments.id AS comment_id,
-  comments.user_id,
-  comments.req_id,
-  comments.comments,
-  files.file_urls,
-  customers.name,
-  vendor.vendor_name,
-  status.status_name,
-  category.category_name,
-  products.name AS product_name,
-  requisition_type.requisition_type_name
-FROM requisition_master_data AS master
-LEFT JOIN requisition_details_data AS details
-  ON master.requisition_master_id = details.requisition_master_id
-LEFT JOIN requisition_status AS rs 
-  ON master.requisition_master_id = rs.requisition_master_id
-LEFT JOIN comments
-  ON master.requisition_master_id = comments.requisition_master_id
-LEFT JOIN (
-  SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls
-  FROM requisition_file_details
-  GROUP BY requisition_master_id
-) AS files
-  ON master.requisition_master_id = files.requisition_master_id
-LEFT JOIN customers
-  ON master.customer_id = customers.customer_id
-LEFT JOIN vendor
-  ON master.supplier_id = vendor.vendor_id
-LEFT JOIN status
-  ON rs.status_id = status.status_id
-LEFT JOIN category
-  ON details.item_category_id = category.category_id
-LEFT JOIN products
-  ON details.item_name = products.id
-LEFT JOIN requisition_type
-  ON master.requisition_type_id = requisition_type.requisition_type_id
+    SELECT DISTINCT
+      master.requisition_master_id,
+      master.requisition_type_id,
+      master.project_id,
+      master.requisition_id,
+      master.req_name,
+      master.supplier_id,
+      master.total_amount,
+      master.created_at,
+      details.uom,
+      details.unit_price,
+      details.qty,
+      details.amount,
+      rs.status_id,
+      rs.assigned_to, 
+      comments.id AS comment_id,
+      comments.user_id,
+      comments.req_id,
+      comments.comments,
+      files.file_urls,
+      customers.name,
+      vendor.vendor_name,
+      status.status_name,
+      category.category_name,
+      products.name AS product_name,
+      requisition_type.requisition_type_name
+    FROM requisition_master_data AS master
+    LEFT JOIN requisition_details_data AS details
+      ON master.requisition_master_id = details.requisition_master_id
+    LEFT JOIN requisition_status AS rs 
+      ON master.requisition_master_id = rs.requisition_master_id
+    LEFT JOIN comments
+      ON master.requisition_master_id = comments.requisition_master_id
+    LEFT JOIN (
+      SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls
+      FROM requisition_file_details
+      GROUP BY requisition_master_id
+    ) AS files
+      ON master.requisition_master_id = files.requisition_master_id
+    LEFT JOIN customers
+      ON master.customer_id = customers.customer_id
+    LEFT JOIN vendor
+      ON master.supplier_id = vendor.vendor_id
+    LEFT JOIN status
+      ON rs.status_id = status.status_id
+    LEFT JOIN category
+      ON details.item_category_id = category.category_id
+    LEFT JOIN products
+      ON details.item_name = products.id
+    LEFT JOIN requisition_type
+      ON master.requisition_type_id = requisition_type.requisition_type_id
+    WHERE master.requisition_id = $1
   `;
 
   const result = await pool.query(getDataQuery, [requisitionId]);
@@ -370,7 +371,6 @@ LEFT JOIN requisition_type
 
   return data;
 };
-
 module.exports = {
   insertMasterData,
   insertDetails,
