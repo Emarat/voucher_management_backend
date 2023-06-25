@@ -110,6 +110,7 @@ const getAllData = async () => {
   comments.req_id,
   comments.comments,
   files.file_urls,
+  files.requisition_file_id,
   customers.name,
   vendor.vendor_name,
   status.status_name,
@@ -124,7 +125,7 @@ LEFT JOIN requisition_status AS rs
 LEFT JOIN comments
   ON master.requisition_master_id = comments.requisition_master_id
 LEFT JOIN (
-  SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls
+  SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls, STRING_AGG(requisition_file_id::text, ', ') AS requisition_file_id
   FROM requisition_file_details
   GROUP BY requisition_master_id
 ) AS files
@@ -142,7 +143,6 @@ LEFT JOIN products
 LEFT JOIN requisition_type
   ON master.requisition_type_id = requisition_type.requisition_type_id;
 ;
-
   `;
 
   const result = await pool.query(getDataQuery);
@@ -168,9 +168,15 @@ LEFT JOIN requisition_type
       }
       if (row.file_urls) {
         const fileUrls = row.file_urls.split(',').map((url) => url.trim());
-        fileUrls.forEach((url) => {
-          if (!existingData.file_urls.find((file) => file.url === url)) {
-            existingData.file_urls.push({ url });
+        fileUrls.forEach((url, index) => {
+          const fileExists = existingData.file_urls.find(
+            (file) => file.url === url
+          );
+          if (!fileExists) {
+            existingData.file_urls.push({
+              url,
+              requisition_file_id: row.requisition_file_id.split(', ')[index],
+            });
           }
         });
       }
@@ -204,10 +210,12 @@ LEFT JOIN requisition_type
 
       if (row.file_urls) {
         const fileUrls = row.file_urls.split(',').map((url) => url.trim());
-        fileUrls.forEach((url) => {
-          if (!newData.file_urls.find((file) => file.url === url)) {
-            newData.file_urls.push({ url });
-          }
+        const requisitionFileIds = row.requisition_file_id.split(', ');
+        fileUrls.forEach((url, index) => {
+          newData.file_urls.push({
+            url,
+            requisition_file_id: requisitionFileIds[index],
+          });
         });
       }
 
@@ -233,58 +241,59 @@ LEFT JOIN requisition_type
 //get sigle data based on requisition id
 const getSingleData = async (requisitionId) => {
   const getDataQuery = `
-    SELECT DISTINCT
-      master.requisition_master_id,
-      master.requisition_type_id,
-      master.project_id,
-      master.requisition_id,
-      master.req_name,
-      master.supplier_id,
-      master.total_amount,
-      master.created_at,
-      details.uom,
-      details.unit_price,
-      details.qty,
-      details.amount,
-      rs.status_id,
-      rs.assigned_to, 
-      comments.id AS comment_id,
-      comments.user_id,
-      comments.req_id,
-      comments.comments,
-      files.file_urls,
-      customers.name,
-      vendor.vendor_name,
-      status.status_name,
-      category.category_name,
-      products.name AS product_name,
-      requisition_type.requisition_type_name
-    FROM requisition_master_data AS master
-    LEFT JOIN requisition_details_data AS details
-      ON master.requisition_master_id = details.requisition_master_id
-    LEFT JOIN requisition_status AS rs 
-      ON master.requisition_master_id = rs.requisition_master_id
-    LEFT JOIN comments
-      ON master.requisition_master_id = comments.requisition_master_id
-    LEFT JOIN (
-      SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls
-      FROM requisition_file_details
-      GROUP BY requisition_master_id
-    ) AS files
-      ON master.requisition_master_id = files.requisition_master_id
-    LEFT JOIN customers
-      ON master.customer_id = customers.customer_id
-    LEFT JOIN vendor
-      ON master.supplier_id = vendor.vendor_id
-    LEFT JOIN status
-      ON rs.status_id = status.status_id
-    LEFT JOIN category
-      ON details.item_category_id = category.category_id
-    LEFT JOIN products
-      ON details.item_name = products.id
-    LEFT JOIN requisition_type
-      ON master.requisition_type_id = requisition_type.requisition_type_id
-    WHERE master.requisition_id = $1
+  SELECT DISTINCT
+  master.requisition_master_id,
+  master.requisition_type_id,
+  master.project_id,
+  master.requisition_id,
+  master.req_name,
+  master.supplier_id,
+  master.total_amount,
+  master.created_at,
+  details.uom,
+  details.unit_price,
+  details.qty,
+  details.amount,
+  rs.status_id,
+  rs.assigned_to, 
+  comments.id AS comment_id,
+  comments.user_id,
+  comments.req_id,
+  comments.comments,
+  files.file_urls,
+  files.requisition_file_ids,
+  customers.name,
+  vendor.vendor_name,
+  status.status_name,
+  category.category_name,
+  products.name AS product_name,
+  requisition_type.requisition_type_name
+FROM requisition_master_data AS master
+LEFT JOIN requisition_details_data AS details
+  ON master.requisition_master_id = details.requisition_master_id
+LEFT JOIN requisition_status AS rs 
+  ON master.requisition_master_id = rs.requisition_master_id
+LEFT JOIN comments
+  ON master.requisition_master_id = comments.requisition_master_id
+LEFT JOIN (
+  SELECT requisition_master_id, STRING_AGG(file_url, ', ') AS file_urls, STRING_AGG(CAST(requisition_file_id AS text), ', ') AS requisition_file_ids
+  FROM requisition_file_details
+  GROUP BY requisition_master_id
+) AS files
+  ON master.requisition_master_id = files.requisition_master_id
+LEFT JOIN customers
+  ON master.customer_id = customers.customer_id
+LEFT JOIN vendor
+  ON master.supplier_id = vendor.vendor_id
+LEFT JOIN status
+  ON rs.status_id = status.status_id
+LEFT JOIN category
+  ON details.item_category_id = category.category_id
+LEFT JOIN products
+  ON details.item_name = products.id
+LEFT JOIN requisition_type
+  ON master.requisition_type_id = requisition_type.requisition_type_id
+WHERE master.requisition_id = $1;
   `;
 
   const result = await pool.query(getDataQuery, [requisitionId]);
@@ -308,11 +317,14 @@ const getSingleData = async (requisitionId) => {
           comment: row.comments,
         });
       }
-      if (row.file_urls) {
+      if (row.file_urls && row.requisition_file_ids) {
         const fileUrls = row.file_urls.split(',').map((url) => url.trim());
-        fileUrls.forEach((url) => {
+        const fileIds = row.requisition_file_ids
+          .split(',')
+          .map((id) => id.trim());
+        fileUrls.forEach((url, index) => {
           if (!existingData.file_urls.find((file) => file.url === url)) {
-            existingData.file_urls.push({ url });
+            existingData.file_urls.push({ url, file_id: fileIds[index] });
           }
         });
       }
@@ -344,11 +356,14 @@ const getSingleData = async (requisitionId) => {
         });
       }
 
-      if (row.file_urls) {
+      if (row.file_urls && row.requisition_file_ids) {
         const fileUrls = row.file_urls.split(',').map((url) => url.trim());
-        fileUrls.forEach((url) => {
+        const fileIds = row.requisition_file_ids
+          .split(',')
+          .map((id) => id.trim());
+        fileUrls.forEach((url, index) => {
           if (!newData.file_urls.find((file) => file.url === url)) {
-            newData.file_urls.push({ url });
+            newData.file_urls.push({ url, file_id: fileIds[index] });
           }
         });
       }
