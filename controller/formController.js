@@ -16,6 +16,8 @@ const {
   getRequisitionTypes,
   getAllData,
   getSingleData,
+  getDataByTwoQueries,
+  getDataBySingleQuery,
 } = require('../Query/requisitionFormQuery');
 
 // let counter = 1;
@@ -257,12 +259,34 @@ router.get('/requisitionType', async (req, res) => {
 //   }
 // });
 
+// router.get('/getAllData', async (req, res) => {
+//   const { requisition_id } = req.query;
+
+//   try {
+//     if (requisition_id) {
+//       const data = await getSingleData(requisition_id);
+//       res.status(200).json(data);
+//     } else {
+//       const data = await getAllData();
+//       res.status(200).json(data);
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.sendStatus(500);
+//   }
+// });
 router.get('/getAllData', async (req, res) => {
-  const { requisition_id } = req.query;
+  const { requisition_id, name, status_name } = req.query;
 
   try {
     if (requisition_id) {
       const data = await getSingleData(requisition_id);
+      res.status(200).json(data);
+    } else if (name && status_name) {
+      const data = await getDataByTwoQueries(name, status_name);
+      res.status(200).json(data);
+    } else if (name || status_name) {
+      const data = await getDataBySingleQuery(name || status_name);
       res.status(200).json(data);
     } else {
       const data = await getAllData();
