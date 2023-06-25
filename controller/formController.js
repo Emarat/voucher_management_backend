@@ -276,7 +276,7 @@ router.get('/requisitionType', async (req, res) => {
 //   }
 // });
 router.get('/getAllData', async (req, res) => {
-  const { requisition_id, name, status_name } = req.query;
+  const { requisition_id, name, status_name, sortOrder } = req.query;
 
   try {
     if (requisition_id) {
@@ -289,7 +289,7 @@ router.get('/getAllData', async (req, res) => {
       const data = await getDataBySingleQuery(name || status_name);
       res.status(200).json(data);
     } else {
-      const data = await getAllData();
+      const data = await getAllData(sortOrder);
       res.status(200).json(data);
     }
   } catch (err) {

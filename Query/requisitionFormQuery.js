@@ -88,7 +88,7 @@ const getRequisitionTypes = async () => {
 };
 
 //getAllData
-const getAllData = async () => {
+const getAllData = async (sortOrder = 'asc') => {
   const getDataQuery = `
   SELECT DISTINCT
   master.requisition_master_id,
@@ -234,7 +234,13 @@ LEFT JOIN requisition_type
       amount: row.amount,
     });
   });
-
+  data.sort((a, b) => {
+    if (sortOrder === 'desc') {
+      return b.requisition_master_id - a.requisition_master_id; // Sort in descending order (newest to oldest)
+    } else {
+      return a.requisition_master_id - b.requisition_master_id; // Sort in ascending order (oldest to newest)
+    }
+  });
   return data;
 };
 
