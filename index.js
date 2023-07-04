@@ -33,6 +33,7 @@ app.use('/', uomController);
 app.use('/', camundaController);
 app.use('/', keycloakUsers);
 app.use('/', formController);
+app.use('/uploads', express.static('uploads'));
 
 app.get('/', function (req, res) {
   res.send('Server Started');
